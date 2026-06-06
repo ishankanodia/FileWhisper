@@ -32,6 +32,14 @@ For public distribution, plan for:
 - notarization
 - DMG or app bundle distribution
 
+Unsigned GitHub Actions builds may show `"FileWhisper" is damaged and can't be opened.` For local testing only, remove quarantine after dragging the app to Applications:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/FileWhisper.app
+```
+
+This is not a substitute for proper public distribution. A consumer-facing macOS release should be signed with a Developer ID certificate and notarized by Apple.
+
 ## Windows
 
 Build on Windows:

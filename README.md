@@ -145,6 +145,24 @@ Expected artifact names:
 
 For public distribution, create a GitHub Release and upload the generated `.dmg` and `.exe`.
 
+## macOS Download Warning
+
+GitHub Actions builds are unsigned by default. On macOS, an unsigned downloaded app may show:
+
+```text
+"FileWhisper" is damaged and can't be opened.
+```
+
+For local testing, remove the quarantine flag after dragging the app to Applications:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/FileWhisper.app
+```
+
+Then open the app again.
+
+For real public distribution, use an Apple Developer account to code sign and notarize the app. Without notarization, many Mac users will see Gatekeeper warnings.
+
 ## LLM Configuration
 
 The app supports these providers:
