@@ -1,57 +1,51 @@
 # Server RAG
 
-A local desktop-ready RAG app for indexing files and asking questions over them with retrieval augmented generation.
+Desktop-ready local RAG for asking questions over files on your computer.
 
-## What It Does
+The app indexes local documents, retrieves relevant chunks with FAISS, and answers questions using a configurable LLM provider.
 
-- Browses local folders from the web UI.
-- Indexes `.txt`, `.md`, `.pdf`, and common image files.
+## Features
+
+- Browse and index local folders/files.
+- Ask questions over indexed documents.
+- Supports `.txt`, `.md`, `.pdf`, and common image formats.
 - Extracts PDF text with PyMuPDF.
 - Extracts image text with Tesseract OCR.
-- Stores embeddings in a local FAISS index.
-- Answers questions with a configurable LLM provider.
-- Can run as a developer server today and is scaffolded for Mac/Windows desktop packaging with Tauri.
+- Uses local FAISS storage for embeddings.
+- Supports Groq, OpenAI, Claude, Gemini, and custom OpenAI-compatible APIs.
+- Includes a Tauri desktop shell for Mac and Windows packaging.
 
-## API Keys And Models
+## Distribution Options
 
-Do not ship your personal LLM key in public code. For a consumer desktop app, the cleanest options are:
+### For Normal Users
 
-- Ask advanced users to provide their own key through a private local config flow.
-- Route requests through your hosted backend with authentication and usage limits.
-- Use a local model runtime such as Ollama/llama.cpp for privacy-first offline mode.
+Ship a desktop app.
 
-The app supports:
+Users should download a finished installer:
 
-- Groq
-- OpenAI
-- Anthropic Claude
-- Google Gemini
-- Any custom OpenAI-compatible provider with a `/chat/completions` endpoint
+- macOS: `.dmg`
+- Windows: `.exe`
 
-You can configure the LLM in two ways:
+They should not need Git, Python, Node, Rust, or Terminal.
 
-1. Environment variables or deployment secrets for API keys.
-2. The in-app `LLM Settings` panel for choosing the provider/model already configured on the server.
+Expected user flow:
 
-In the desktop/local build, users can paste a provider key in `LLM Settings`, or you can preconfigure one in `.env`. Hosted public deployments should use server-side secrets instead of exposing shared keys in the UI.
+1. Download and open the app.
+2. Choose an LLM provider/model.
+3. Paste an API key once.
+4. Browse local files or folders.
+5. Index selected files.
+6. Ask questions.
 
-## How Users Run It
+API keys are saved on the user's own computer in local app config.
 
-There are three practical ways to ship this app:
+### For Developers
 
-1. Packaged desktop app: users download a Mac/Windows app, grant folder access, and ask questions. This best matches local-file RAG.
-2. Hosted web app: users upload files to a server, then ask questions. A hosted website cannot directly browse local folders.
-3. Local developer app: users clone/download the code, install dependencies, add a `.env`, and run `uvicorn` in a terminal.
-
-For users who do not know about AI/API keys, use the packaged desktop app plus either a hosted backend or a local model mode.
-
-## Option 1: Developer Setup From GitHub
-
-Use this path for technical users who are comfortable with Terminal.
+Developers can clone the repo and run the app locally from Terminal.
 
 ```bash
-git clone https://github.com/your-username/server-rag.git
-cd server-rag
+git clone https://github.com/ishankanodia/server_rag.git
+cd server_rag
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -73,60 +67,15 @@ For image OCR on macOS:
 brew install tesseract
 ```
 
-## Option 2: Desktop App For Normal Users
+## Desktop Development
 
-Use this path for non-technical users.
-
-They should not clone the repo or run Terminal commands. They should download a finished app:
-
-- macOS: `.dmg` or `.app`
-- Windows: `.exe` or `.msi`
-
-User flow:
-
-1. Download and open the app.
-2. Choose provider/model in `LLM Settings`.
-3. Paste their API key once.
-4. Browse local files/folders.
-5. Index selected files.
-6. Ask questions.
-
-The API key is saved on their own computer in the local app config, not in the repo.
-
-## Local Server Setup
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-```
-
-Edit `.env` and add your API key.
-
-For image OCR, install the Tesseract system binary too:
-
-```bash
-brew install tesseract
-```
-
-Start the server:
-
-```bash
-python server_launcher.py
-```
-
-## Desktop App Development
-
-This repo includes a Tauri desktop shell. In development, Tauri opens a native window and starts the Python backend locally.
-
-Install desktop build prerequisites:
+Install Node dependencies:
 
 ```bash
 npm install
 ```
 
-Install Rust from:
+Install Rust:
 
 ```text
 https://rustup.rs
@@ -138,14 +87,14 @@ Run the desktop app in development:
 npm run desktop:dev
 ```
 
-If Rust is not installed, desktop commands will fail until `rustc` and `cargo` are available.
+This starts the Python backend locally and opens the Tauri desktop window.
 
-## Desktop Packaging For Mac And Windows
+## Build Installers
 
-Desktop packaging has two layers:
+Builds must be produced on the target OS:
 
-1. Package the Python backend into a native executable with PyInstaller.
-2. Bundle that executable inside the Tauri desktop app.
+- Build macOS artifacts on macOS.
+- Build Windows artifacts on Windows.
 
 Install build dependencies:
 
@@ -155,69 +104,58 @@ pip install -r requirements-dev.txt
 npm install
 ```
 
-Build the backend executable on the target OS:
+Build the Python backend executable:
 
 ```bash
 pyinstaller server-rag-backend.spec
 ```
 
-Then build the desktop app:
+Build the desktop app:
 
 ```bash
 npm run desktop:build
 ```
 
-Output locations:
+Artifacts are generated under:
 
-- macOS app/bundles: `src-tauri/target/release/bundle/`
-- Windows installers: `src-tauri/target/release/bundle/`
-
-Build Mac artifacts on macOS and Windows artifacts on Windows. Cross-compiling desktop installers is possible but painful; CI with separate Mac and Windows runners is usually cleaner.
+```text
+src-tauri/target/release/bundle/
+```
 
 ## Build With GitHub Actions
 
-This repo includes `.github/workflows/desktop-build.yml`.
+The repo includes:
 
-Push the repo to GitHub:
-
-```bash
-git add .
-git commit -m "Prepare desktop RAG app"
-git remote add origin https://github.com/your-username/server-rag.git
-git push -u origin main
+```text
+.github/workflows/desktop-build.yml
 ```
 
-If the remote already exists, use:
+To create downloadable artifacts:
 
-```bash
-git remote set-url origin https://github.com/your-username/server-rag.git
-git push -u origin main
-```
+1. Open the repo on GitHub.
+2. Go to `Actions`.
+3. Select `Desktop Builds`.
+4. Click `Run workflow`.
+5. Download the artifacts when the workflow finishes.
 
-After pushing, build downloadable Mac and Windows artifacts from the GitHub Actions tab:
+Expected artifact names:
 
-1. Push this repo to GitHub.
-2. Open the repo on GitHub.
-3. Go to `Actions`.
-4. Select `Desktop Builds`.
-5. Click `Run workflow`.
-6. Download the generated artifacts after the workflow completes.
+- `server-rag-macos`
+- `server-rag-windows`
 
-You can also create a tagged release build:
+For public distribution, create a GitHub Release and upload the generated `.dmg` and `.exe`.
 
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
+## LLM Configuration
 
-The workflow builds both:
+The app supports these providers:
 
-- `macos-latest`
-- `windows-latest`
+- Groq
+- OpenAI
+- Anthropic Claude
+- Google Gemini
+- Custom OpenAI-compatible APIs
 
-## Environment Variables
-
-Groq:
+Environment examples:
 
 ```bash
 LLM_PROVIDER=groq
@@ -225,15 +163,11 @@ LLM_MODEL=llama-3.3-70b-versatile
 GROQ_API_KEY=your_key
 ```
 
-OpenAI:
-
 ```bash
 LLM_PROVIDER=openai
 LLM_MODEL=gpt-5-mini
 OPENAI_API_KEY=your_key
 ```
-
-Anthropic Claude:
 
 ```bash
 LLM_PROVIDER=anthropic
@@ -241,15 +175,11 @@ LLM_MODEL=claude-sonnet-4-6
 ANTHROPIC_API_KEY=your_key
 ```
 
-Google Gemini:
-
 ```bash
 LLM_PROVIDER=gemini
 LLM_MODEL=gemini-2.5-flash
 GEMINI_API_KEY=your_key
 ```
-
-Custom OpenAI-compatible provider:
 
 ```bash
 LLM_PROVIDER=custom
@@ -258,50 +188,35 @@ LLM_BASE_URL=https://your-provider.example/v1
 LLM_API_KEY=your_key
 ```
 
-## Deployment Notes
+## Project Structure
 
-This app is safest as a single-user local desktop app because it can browse and index files visible to the app process.
+```text
+main.py                    FastAPI app and LLM routing
+rag.py                     Ingestion, chunking, embeddings, FAISS search
+server_launcher.py         Local backend launcher
+static/index.html          Main UI
+src-tauri/                 Tauri desktop shell
+.github/workflows/         GitHub Actions desktop builds
+server-rag-backend.spec    PyInstaller backend build config
+```
 
-Before deploying publicly:
+## Security Notes
 
-- Add authentication.
-- Restrict or remove `/browse` for server filesystem access.
 - Do not commit `.env`.
 - Do not commit `rag_data/`; it can contain private document text and local file paths.
-- Prefer provider API keys in environment variables instead of asking public users to paste keys.
+- A hosted web app cannot browse a user's local folders. Hosted mode should use file uploads instead.
+- Do not expose one shared API key publicly without auth, rate limits, and abuse controls.
+- Revoke any API key that was ever committed to git history.
 
-## Simple Hosting Options
+## Hosted Web Version
 
-### Render, Railway, Fly.io, or Similar
+This project is currently optimized for local desktop use.
 
-For a hosted web version, replace folder browsing with file upload. A hosted server cannot access a user's local folders.
+If you want a hosted web version, replace local folder browsing with file upload:
 
-Use this start command:
+1. User opens website.
+2. User uploads documents.
+3. Server indexes uploaded files.
+4. User asks questions.
 
-```bash
-uvicorn main:app --host 0.0.0.0 --port $PORT
-```
-
-Set environment variables in the platform dashboard, for example:
-
-```bash
-LLM_PROVIDER=groq
-LLM_MODEL=llama-3.3-70b-versatile
-GROQ_API_KEY=your_key
-```
-
-Persistent indexing requires a persistent disk/volume mounted to the app directory or to `rag_data/`. Without persistent storage, the index may disappear on redeploy or restart.
-
-### Docker
-
-Create an image that installs Python dependencies and the `tesseract-ocr` system package, then run:
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8001
-```
-
-Mount a volume for `rag_data/` if you want indexes to survive container restarts.
-
-## Important Security Choice
-
-If other people will use a hosted version, do not let random users browse your server filesystem. A production multi-user version should add accounts, per-user indexes, upload-based ingestion instead of server browsing, and rate limits.
+Do not expose `/browse` on a public hosted server.
