@@ -6,6 +6,9 @@ on:
     tags:
       - "v*"
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     name: Build ${{ matrix.os }}
@@ -13,7 +16,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest]
+        include:
+          - os: macos-latest
+            bundle: dmg
+            artifact: server-rag-macos
+          - os: windows-latest
+            bundle: nsis
+            artifact: server-rag-windows
 
     steps:
       - name: Checkout
@@ -45,10 +54,10 @@ jobs:
         run: pyinstaller server-rag-backend.spec
 
       - name: Build desktop app
-        run: npm run desktop:build
+        run: npm run desktop:build -- --bundles ${{ matrix.bundle }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: server-rag-${{ matrix.os }}
+          name: ${{ matrix.artifact }}
           path: src-tauri/target/release/bundle/**
