@@ -42,6 +42,13 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install Windows installer tooling
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          choco install nsis -y
+          echo "C:\Program Files (x86)\NSIS" >> $env:GITHUB_PATH
+
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
