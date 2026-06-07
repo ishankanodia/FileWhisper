@@ -21,7 +21,7 @@ jobs:
             bundle: dmg
             artifact: filewhisper-macos
             artifact_path: src-tauri/target/release/bundle/dmg/*.dmg
-          - os: windows-latest
+          - os: windows-2022
             bundle: nsis
             artifact: filewhisper-windows
             artifact_path: src-tauri/target/release/bundle/nsis/*.exe
@@ -45,7 +45,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Windows installer tooling
-        if: matrix.os == 'windows-latest'
+        if: startsWith(matrix.os, 'windows-')
         shell: pwsh
         run: |
           choco install nsis -y
