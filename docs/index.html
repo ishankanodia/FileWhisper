@@ -603,9 +603,6 @@
         <img src="logo.png" alt="FileWhisper Logo" class="logo-img" />
         <span class="logo-text">FileWhisper</span>
       </a>
-      <div class="nav-actions">
-        <a href="#download" class="btn-nav-download">Download</a>
-      </div>
     </div>
   </header>
 
@@ -836,10 +833,10 @@
         macIntelBtnText.innerText = `Download DMG (${tag})`;
         winBtnText.innerText = `Download EXE (${tag})`;
       } catch (err) {
-        versionTag.innerText = "Releases on GitHub";
-        macSiliconCard.href = releasePageUrl;
-        macIntelCard.href = releasePageUrl;
-        winCard.href = releasePageUrl;
+        versionTag.innerText = "Version 0.1.0";
+        macSiliconCard.href = "#download";
+        macIntelCard.href = "#download";
+        winCard.href = "#download";
         macSiliconBtnText.innerText = "Download DMG (Silicon)";
         macIntelBtnText.innerText = "Download DMG (Intel)";
         winBtnText.innerText = "Download EXE";
