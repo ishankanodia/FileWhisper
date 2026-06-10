@@ -16,7 +16,7 @@
   
   <style>
     :root {
-      --bg: #000000;
+      --bg: #030303;
       --card-bg: #09090b;
       --card-hover: #121214;
       --border: #1f1f23;
@@ -25,7 +25,7 @@
       --text-muted: #a1a1aa;
       --accent: #f4f4f5;
       --radius-lg: 12px;
-      --radius-sm: 6px;
+      --radius-sm: 8px;
       --font-mono: 'Geist Mono', monospace;
     }
 
@@ -35,18 +35,67 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: 'Geist', sans-serif;
       background-color: var(--bg);
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+      background-position: center top;
       color: var(--text);
       line-height: 1.5;
       overflow-x: hidden;
+      position: relative;
     }
 
+    /* Ambient Glows */
+    .glow-top {
+      position: absolute;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.05) 0%, rgba(112, 0, 255, 0.03) 50%, transparent 100%);
+      z-index: -1;
+      pointer-events: none;
+      filter: blur(80px);
+    }
+
+    .glow-bottom {
+      position: absolute;
+      top: 900px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(112, 0, 255, 0.03) 0%, rgba(0, 240, 255, 0.02) 60%, transparent 100%);
+      z-index: -1;
+      pointer-events: none;
+      filter: blur(100px);
+    }
+
+    /* Sticky Navbar */
     header {
-      max-width: 1000px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(3, 3, 3, 0.75);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      max-width: 100%;
+    }
+
+    .header-inner {
+      max-width: 900px;
       margin: 0 auto;
-      padding: 32px 24px;
+      padding: 16px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -61,26 +110,32 @@
     }
 
     .logo-img {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       object-fit: contain;
     }
 
     .logo-text {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
       letter-spacing: -0.5px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
 
     .btn-github {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 14px;
+      padding: 7px 14px;
       border-radius: 6px;
-      background: #09090b;
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border);
-      color: var(--text);
+      color: var(--text-muted);
       text-decoration: none;
       font-weight: 500;
       font-size: 13px;
@@ -88,20 +143,47 @@
     }
 
     .btn-github:hover {
-      background: var(--card-hover);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
       border-color: var(--border-hover);
+    }
+
+    .btn-nav-download {
+      background: #ffffff;
+      color: #000000;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-nav-download:hover {
+      background: #e4e4e7;
+      transform: translateY(-1px);
     }
 
     /* Main Container */
     main {
-      max-width: 860px;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 40px 24px 100px;
+      padding: 60px 24px 100px;
+    }
+
+    /* Entry Animation */
+    .animate-fade-in {
+      animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 60px;
+      margin-bottom: 70px;
     }
 
     .version-tag {
@@ -109,19 +191,23 @@
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 500;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-      padding: 3px 10px;
+      color: #00f0ff;
+      background: rgba(0, 240, 255, 0.05);
+      border: 1px solid rgba(0, 240, 255, 0.15);
+      padding: 4px 12px;
       border-radius: 100px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     h1 {
-      font-size: 42px;
+      font-size: 46px;
       font-weight: 600;
       line-height: 1.15;
-      letter-spacing: -1.2px;
+      letter-spacing: -1.5px;
       margin-bottom: 20px;
+      background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .tagline {
@@ -132,16 +218,47 @@
       line-height: 1.6;
     }
 
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 36px;
+    }
+
+    .btn-primary {
+      background: #ffffff;
+      color: #000000;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(255,255,255,0.05);
+    }
+
+    .btn-primary:hover {
+      background: #e4e4e7;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255,255,255,0.1);
+    }
+
     /* Desktop Screenshot Showcase */
     .screenshot-container {
       width: 100%;
       background: #09090b;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius-lg);
       overflow: hidden;
-      margin-bottom: 60px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255,255,255,0.015);
+      margin-bottom: 70px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 80px rgba(0, 240, 255, 0.02);
       position: relative;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .screenshot-container:hover {
+      border-color: rgba(0, 240, 255, 0.2);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 80px rgba(0, 240, 255, 0.06);
     }
 
     .screenshot-header {
@@ -173,10 +290,12 @@
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
       font-weight: 500;
       letter-spacing: 0.5px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
     }
 
     .screenshot-img {
@@ -189,7 +308,7 @@
 
     /* How it works */
     .how-it-works {
-      margin-bottom: 60px;
+      margin-bottom: 70px;
     }
     .how-it-works h2 {
       font-size: 22px;
@@ -209,12 +328,16 @@
       border-radius: var(--radius-sm);
       padding: 24px;
       position: relative;
+      transition: border-color 0.2s;
+    }
+    .step-card:hover {
+      border-color: var(--border-hover);
     }
     .step-num {
       font-family: var(--font-mono);
       font-size: 32px;
       font-weight: 700;
-      color: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.04);
       position: absolute;
       top: 16px;
       right: 20px;
@@ -236,13 +359,14 @@
       background: #09090b;
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 40px 24px;
+      padding: 50px 32px;
       margin-bottom: 50px;
       text-align: center;
+      position: relative;
     }
 
     .download-section h2 {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 600;
       margin-bottom: 24px;
       letter-spacing: -0.5px;
@@ -258,20 +382,47 @@
       background: #030303;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 28px 16px;
+      padding: 32px 18px 24px;
       text-decoration: none;
       color: inherit;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       position: relative;
+      overflow: hidden;
+    }
+
+    .download-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at top, rgba(0, 240, 255, 0.02) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .download-card:hover::before {
+      opacity: 1;
     }
 
     .download-card:hover {
-      background: #0e0e11;
+      background: #0a0a0d;
       border-color: var(--border-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Glowing border wrapper for detected architecture recommended card */
+    .download-card.recommended-card {
+      border-color: rgba(0, 240, 255, 0.25);
+    }
+
+    .download-card.recommended-card:hover {
+      border-color: rgba(0, 240, 255, 0.5);
+      box-shadow: 0 12px 30px rgba(0, 240, 255, 0.04), 0 12px 30px rgba(0, 0, 0, 0.6);
     }
 
     .download-icon {
@@ -279,10 +430,15 @@
       height: 24px;
       fill: var(--text-muted);
       margin-bottom: 12px;
+      transition: fill 0.2s;
     }
 
     .download-card:hover .download-icon {
       fill: var(--text);
+    }
+
+    .download-card.recommended-card .download-icon {
+      fill: #00f0ff;
     }
 
     .download-title {
@@ -295,14 +451,14 @@
       font-family: var(--font-mono);
       font-size: 11px;
       color: var(--text-muted);
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .btn-download-action {
       background: #ffffff;
       color: #000000;
-      padding: 8px 16px;
-      border-radius: 4px;
+      padding: 9px 16px;
+      border-radius: 6px;
       font-weight: 500;
       font-size: 12.5px;
       transition: all 0.2s;
@@ -314,6 +470,15 @@
       background: #e4e4e7;
     }
 
+    .download-card.recommended-card .btn-download-action {
+      background: #00f0ff;
+      color: #000000;
+    }
+
+    .download-card.recommended-card:hover .btn-download-action {
+      background: #33f3ff;
+    }
+
     .os-badge {
       position: absolute;
       top: 10px;
@@ -322,7 +487,7 @@
       font-weight: 600;
       padding: 2px 6px;
       border-radius: 4px;
-      background: #18181b;
+      background: rgba(0, 240, 255, 0.08);
       color: #00f0ff;
       border: 1px solid rgba(0, 240, 255, 0.2);
       display: none;
@@ -335,7 +500,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 24px;
-      margin-bottom: 50px;
+      margin-bottom: 70px;
       display: none;
       text-align: left;
     }
@@ -365,13 +530,13 @@
 
     /* Detailed Features Grid */
     .features-section {
-      margin-bottom: 60px;
+      margin-bottom: 70px;
     }
 
     .features-section h3 {
       font-size: 20px;
       font-weight: 600;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       letter-spacing: -0.5px;
       text-align: center;
     }
@@ -386,13 +551,17 @@
       background: #09090b;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 20px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .feature-card:hover {
+      border-color: var(--border-hover);
     }
 
     .feature-title {
       font-size: 14px;
       font-weight: 600;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       color: var(--text);
     }
 
@@ -417,31 +586,48 @@
       .steps-grid { grid-template-columns: 1fr; }
       .screenshot-container { margin-bottom: 40px; }
       .features-grid { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; gap: 12px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Background Grid Glows -->
+  <div class="glow-top"></div>
+  <div class="glow-bottom"></div>
+
+  <!-- Sticky Header -->
   <header>
-    <a href="#" class="logo-container">
-      <img src="logo.png" alt="FileWhisper Logo" class="logo-img" />
-      <span class="logo-text">FileWhisper</span>
-    </a>
-    <a href="https://github.com/ishankanodia/server_rag" class="btn-github" target="_blank">
-      <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-      </svg>
-      GitHub
-    </a>
+    <div class="header-inner">
+      <a href="#" class="logo-container">
+        <img src="logo.png" alt="FileWhisper Logo" class="logo-img" />
+        <span class="logo-text">FileWhisper</span>
+      </a>
+      <div class="nav-actions">
+        <a href="https://github.com/ishankanodia/server_rag" class="btn-github" target="_blank">
+          <svg height="15" width="15" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+          </svg>
+          GitHub
+        </a>
+        <a href="#download" class="btn-nav-download">Download</a>
+      </div>
+    </div>
   </header>
 
-  <main>
+  <main class="animate-fade-in">
     <section class="hero">
       <div class="version-tag" id="versionTag">Connecting to Releases...</div>
-      <h1>Chat with your documents, completely offline.</h1>
+      <h1>Chat with your documents,<br>completely offline.</h1>
       <p class="tagline">
         FileWhisper is a simple desktop app that lets you search and ask questions about your files—like PDFs, text documents, or notes. Everything runs directly on your computer, so your data stays 100% private and never leaves your machine.
       </p>
+      <div class="hero-actions">
+        <a href="#download" class="btn-primary">Download FileWhisper</a>
+        <a href="https://github.com/ishankanodia/server_rag" class="btn-github" target="_blank" style="padding: 12px 24px; font-size: 14px; border-radius: 8px;">
+          View Source Code
+        </a>
+      </div>
     </section>
 
     <!-- Desktop Screenshot Showcase -->
@@ -480,7 +666,7 @@
     </section>
 
     <!-- Download Section -->
-    <section class="download-section">
+    <section class="download-section" id="download">
       <h2>Download FileWhisper</h2>
       
       <div class="download-grid">
@@ -625,14 +811,18 @@
         const arch = getMacArchitecture();
         if (arch === "silicon") {
           macSiliconBadge.style.display = "block";
+          macSiliconCard.classList.add("recommended-card");
         } else if (arch === "intel") {
           macIntelBadge.style.display = "block";
+          macIntelCard.classList.add("recommended-card");
         } else {
           // Fallback if unable to determine
           macSiliconBadge.style.display = "block";
+          macSiliconCard.classList.add("recommended-card");
         }
       } else if (os === "Windows") {
         winBadge.style.display = "block";
+        winCard.classList.add("recommended-card");
       }
     }
 
