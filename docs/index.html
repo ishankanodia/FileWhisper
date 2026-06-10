@@ -428,8 +428,8 @@
 
     .download-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
     }
 
     .download-card {
@@ -725,26 +725,15 @@
       <h2>Download FileWhisper</h2>
       
       <div class="download-grid">
-        <!-- macOS Apple Silicon Download Card -->
-        <a href="https://github.com/ishankanodia/server_rag/releases" class="download-card mac-silicon-card" id="macSiliconCard">
-          <div class="os-badge" id="macSiliconBadge">RECOMMENDED FOR YOUR PC</div>
+        <!-- macOS Download Card -->
+        <a href="https://github.com/ishankanodia/server_rag/releases" class="download-card mac-card" id="macCard">
+          <div class="os-badge" id="macBadge">RECOMMENDED FOR YOUR PC</div>
           <svg viewBox="0 0 24 24" class="download-icon">
             <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.12.09 2.27-.57 2.95-1.39z"/>
           </svg>
-          <div class="download-title">macOS Apple Silicon</div>
-          <div class="download-meta">M1 / M2 / M3 / M4 (.dmg)</div>
-          <div class="btn-download-action" id="macSiliconBtnText">Download DMG</div>
-        </a>
-
-        <!-- macOS Intel Download Card -->
-        <a href="https://github.com/ishankanodia/server_rag/releases" class="download-card mac-intel-card" id="macIntelCard">
-          <div class="os-badge" id="macIntelBadge">RECOMMENDED FOR YOUR PC</div>
-          <svg viewBox="0 0 24 24" class="download-icon">
-            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.12.09 2.27-.57 2.95-1.39z"/>
-          </svg>
-          <div class="download-title">macOS Intel</div>
-          <div class="download-meta">Older Intel Macs (.dmg)</div>
-          <div class="btn-download-action" id="macIntelBtnText">Download DMG</div>
+          <div class="download-title">macOS</div>
+          <div class="download-meta">Apple Silicon M1 / M2 / M3 / M4 (.dmg)</div>
+          <div class="btn-download-action" id="macBtnText">Download DMG</div>
         </a>
 
         <!-- Windows Download Card -->
@@ -795,21 +784,17 @@
     const REPO_NAME = "server_rag";
 
     const versionTag = document.getElementById("versionTag");
-    const macSiliconCard = document.getElementById("macSiliconCard");
-    const macIntelCard = document.getElementById("macIntelCard");
+    const macCard = document.getElementById("macCard");
     const winCard = document.getElementById("winCard");
     
-    const macSiliconBadge = document.getElementById("macSiliconBadge");
-    const macIntelBadge = document.getElementById("macIntelBadge");
+    const macBadge = document.getElementById("macBadge");
     const winBadge = document.getElementById("winBadge");
     
-    const macSiliconBtnText = document.getElementById("macSiliconBtnText");
-    const macIntelBtnText = document.getElementById("macIntelBtnText");
+    const macBtnText = document.getElementById("macBtnText");
     const winBtnText = document.getElementById("winBtnText");
 
     let releasePageUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases`;
-    let latestMacSiliconUrl = releasePageUrl;
-    let latestMacIntelUrl = releasePageUrl;
+    let latestMacUrl = releasePageUrl;
     let latestWinUrl = releasePageUrl;
 
     function getOS() {
@@ -823,45 +808,11 @@
       return "unknown";
     }
 
-    function getMacArchitecture() {
-      try {
-        const canvas = document.createElement("canvas");
-        const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-        if (!gl) return "unknown";
-        const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
-        if (!debugInfo) return "unknown";
-        const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_STRING) || "";
-        const vendor = gl.getParameter(debugInfo.UNMASKED_RENDERER_VENDOR_ID) || "";
-        if (/Apple/i.test(renderer) || /Apple/i.test(vendor)) {
-          return "silicon";
-        }
-        if (/Intel/i.test(renderer) || /Intel/i.test(vendor)) {
-          return "intel";
-        }
-      } catch (e) {
-        // fallback
-      }
-      if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) {
-        return "silicon";
-      }
-      return "unknown";
-    }
-
     function showRecommendation() {
       const os = getOS();
       if (os === "macOS") {
-        const arch = getMacArchitecture();
-        if (arch === "silicon") {
-          macSiliconBadge.style.display = "block";
-          macSiliconCard.classList.add("recommended-card");
-        } else if (arch === "intel") {
-          macIntelBadge.style.display = "block";
-          macIntelCard.classList.add("recommended-card");
-        } else {
-          // Fallback if unable to determine
-          macSiliconBadge.style.display = "block";
-          macSiliconCard.classList.add("recommended-card");
-        }
+        macBadge.style.display = "block";
+        macCard.classList.add("recommended-card");
       } else if (os === "Windows") {
         winBadge.style.display = "block";
         winCard.classList.add("recommended-card");
@@ -882,30 +833,22 @@
         assets.forEach(asset => {
           const name = asset.name.toLowerCase();
           if (name.endsWith(".dmg")) {
-            if (name.includes("aarch64") || name.includes("arm64") || name.includes("silicon")) {
-              latestMacSiliconUrl = asset.browser_download_url;
-            } else {
-              latestMacIntelUrl = asset.browser_download_url;
-            }
+            latestMacUrl = asset.browser_download_url;
           } else if (name.endsWith(".exe")) {
             latestWinUrl = asset.browser_download_url;
           }
         });
 
-        macSiliconCard.href = latestMacSiliconUrl;
-        macIntelCard.href = latestMacIntelUrl;
+        macCard.href = latestMacUrl;
         winCard.href = latestWinUrl;
         
-        macSiliconBtnText.innerText = `Download DMG (${tag})`;
-        macIntelBtnText.innerText = `Download DMG (${tag})`;
+        macBtnText.innerText = `Download DMG (${tag})`;
         winBtnText.innerText = `Download EXE (${tag})`;
       } catch (err) {
         versionTag.innerText = "Version 0.1.0";
-        macSiliconCard.href = "#download";
-        macIntelCard.href = "#download";
+        macCard.href = "#download";
         winCard.href = "#download";
-        macSiliconBtnText.innerText = "Download DMG (Silicon)";
-        macIntelBtnText.innerText = "Download DMG (Intel)";
+        macBtnText.innerText = "Download DMG";
         winBtnText.innerText = "Download EXE";
       }
       showRecommendation();

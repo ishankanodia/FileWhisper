@@ -17,13 +17,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-13
-            bundle: dmg
-            artifact: filewhisper-macos-intel
-            artifact_path: src-tauri/target/release/bundle/dmg/*.dmg
           - os: macos-14
             bundle: dmg
-            artifact: filewhisper-macos-silicon
+            artifact: filewhisper-macos
             artifact_path: src-tauri/target/release/bundle/dmg/*.dmg
           - os: windows-2022
             bundle: nsis
