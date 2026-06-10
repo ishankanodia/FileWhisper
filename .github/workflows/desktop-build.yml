@@ -19,7 +19,11 @@ jobs:
         include:
           - os: macos-13
             bundle: dmg
-            artifact: filewhisper-macos
+            artifact: filewhisper-macos-intel
+            artifact_path: src-tauri/target/release/bundle/dmg/*.dmg
+          - os: macos-14
+            bundle: dmg
+            artifact: filewhisper-macos-silicon
             artifact_path: src-tauri/target/release/bundle/dmg/*.dmg
           - os: windows-2022
             bundle: nsis
