@@ -8,8 +8,12 @@ datas = [
 ]
 datas += collect_data_files("sentence_transformers")
 
-hiddenimports = collect_submodules("sentence_transformers")
-hiddenimports += collect_submodules("transformers")
+hiddenimports = [
+    "sentence_transformers",
+    "transformers",
+    "torch",
+    "tokenizers",
+]
 hiddenimports += collect_submodules("langgraph")
 hiddenimports += collect_submodules("langchain_core")
 
@@ -39,7 +43,7 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
     console=False,
