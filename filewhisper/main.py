@@ -11,7 +11,7 @@ import os
 import urllib.error
 import urllib.request
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, Optional
 from dotenv import load_dotenv
 from langgraph.graph import StateGraph
 
@@ -45,8 +45,8 @@ class Query(BaseModel):
 class LLMConfigRequest(BaseModel):
     provider: str
     model: str
-    api_key: str | None = None
-    base_url: str | None = None
+    api_key: Optional[str] = None
+    base_url: Optional[str] = None
 
 
 # =========================
