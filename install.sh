@@ -1,16 +1,16 @@
 #!/bin/bash
 #
-# FileWhisper — one-line installer (macOS)
+# FileWhisper - one-line installer (macOS & Linux)
 #
 #   curl -fsSL https://raw.githubusercontent.com/ishankanodia/server_rag/main/install.sh | bash
 #
 # What it does:
 #   1. Downloads FileWhisper into ~/.filewhisper/app
-#   2. Builds an isolated Python environment (no PyTorch — stays small & fast)
+#   2. Builds an isolated Python environment (no PyTorch - stays small & fast)
 #   3. Pre-downloads the local AI models so the first question is instant
 #   4. Drops a double-click "FileWhisper" launcher on your Desktop
 #
-# After this, the user never needs Terminal again — they just double-click.
+# After this, the user never needs the terminal again - they just double-click.
 #
 set -e
 
@@ -18,7 +18,7 @@ REPO="ishankanodia/server_rag"
 BRANCH="${FILEWHISPER_BRANCH:-main}"
 APP_DIR="$HOME/.filewhisper/app"
 VENV="$APP_DIR/.venv"
-APP_BUNDLE="$HOME/Desktop/FileWhisper.app"
+OS="$(uname -s)"
 
 echo ""
 echo "=================================================="
@@ -26,12 +26,18 @@ echo "   Installing FileWhisper"
 echo "=================================================="
 echo ""
 
-# 1. Make sure Python 3 is available (macOS provides it via Command Line Tools).
+# 1. Make sure Python 3 is available.
 if ! command -v python3 >/dev/null 2>&1; then
   echo "Python 3 is needed but was not found."
-  echo "A macOS install window will open — click \"Install\", let it finish,"
-  echo "then run this command again."
-  xcode-select --install 2>/dev/null || true
+  if [ "$OS" = "Darwin" ]; then
+    echo "A macOS install window will open - click \"Install\", let it finish,"
+    echo "then run this command again."
+    xcode-select --install 2>/dev/null || true
+  else
+    echo "Please install it with your package manager, then run this again, e.g.:"
+    echo "  Debian/Ubuntu:  sudo apt install python3 python3-venv python3-pip"
+    echo "  Fedora:         sudo dnf install python3 python3-pip"
+  fi
   exit 1
 fi
 
@@ -41,7 +47,6 @@ echo "-> Downloading FileWhisper..."
 rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR"
 if [ -n "$FILEWHISPER_SRC" ]; then
-  # Copy local source, excluding bulky/transient dirs.
   ( cd "$FILEWHISPER_SRC" && \
     find . -type d \( -name .git -o -name .venv -o -name node_modules -o -name dist -o -name target \) -prune -o -type f -print \
     | sed 's|^\./||' | while read -r f; do
@@ -76,28 +81,28 @@ except Exception as e:
     print("   (OCR warmup skipped:", e, ")")
 PY
 
-# 5. Build a proper macOS app on the Desktop. It shows as "FileWhisper" with the
-#    logo, launches with NO Terminal window, and quits from the Dock.
-#    Generated locally, so macOS does not quarantine it -> it just opens.
-echo "-> Creating the FileWhisper app..."
-rm -f "$HOME/Desktop/FileWhisper.command"   # remove the older-style launcher if present
-rm -rf "$APP_BUNDLE"
-mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
+LOGO_PNG="$APP_DIR/filewhisper/static/logo.png"
 
-# 5a. App icon, built from the logo with macOS' own sips + iconutil.
-LOGO="$APP_DIR/filewhisper/static/logo.png"
-if [ -f "$LOGO" ]; then
-  ICONSET="$(mktemp -d)/FileWhisper.iconset"
-  mkdir -p "$ICONSET"
-  for s in 16 32 128 256 512; do
-    sips -z "$s" "$s"             "$LOGO" --out "$ICONSET/icon_${s}x${s}.png"     >/dev/null 2>&1
-    sips -z "$((s*2))" "$((s*2))" "$LOGO" --out "$ICONSET/icon_${s}x${s}@2x.png" >/dev/null 2>&1
-  done
-  iconutil -c icns "$ICONSET" -o "$APP_BUNDLE/Contents/Resources/icon.icns" 2>/dev/null || true
-fi
+if [ "$OS" = "Darwin" ]; then
+  # 5a. macOS: build a proper .app on the Desktop (no Terminal window, logo icon).
+  #     Generated locally, so macOS does not quarantine it -> it just opens.
+  echo "-> Creating the FileWhisper app..."
+  APP_BUNDLE="$HOME/Desktop/FileWhisper.app"
+  rm -f "$HOME/Desktop/FileWhisper.command"
+  rm -rf "$APP_BUNDLE"
+  mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
 
-# 5b. Info.plist gives the app its name and icon.
-cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF
+  if [ -f "$LOGO_PNG" ]; then
+    ICONSET="$(mktemp -d)/FileWhisper.iconset"
+    mkdir -p "$ICONSET"
+    for s in 16 32 128 256 512; do
+      sips -z "$s" "$s"             "$LOGO_PNG" --out "$ICONSET/icon_${s}x${s}.png"     >/dev/null 2>&1
+      sips -z "$((s*2))" "$((s*2))" "$LOGO_PNG" --out "$ICONSET/icon_${s}x${s}@2x.png" >/dev/null 2>&1
+    done
+    iconutil -c icns "$ICONSET" -o "$APP_BUNDLE/Contents/Resources/icon.icns" 2>/dev/null || true
+  fi
+
+  cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -116,22 +121,72 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF
 </plist>
 EOF
 
-# 5c. The launcher the app runs. No Terminal window appears; logs go to a file.
-cat > "$APP_BUNDLE/Contents/MacOS/FileWhisper" <<EOF
+  cat > "$APP_BUNDLE/Contents/MacOS/FileWhisper" <<EOF
 #!/bin/bash
 cd "$APP_DIR"
 exec "$VENV/bin/python" -m filewhisper.server_launcher >> "$HOME/.filewhisper/filewhisper.log" 2>&1
 EOF
-chmod +x "$APP_BUNDLE/Contents/MacOS/FileWhisper"
+  chmod +x "$APP_BUNDLE/Contents/MacOS/FileWhisper"
+  touch "$APP_BUNDLE"
 
-touch "$APP_BUNDLE"   # nudge Finder to pick up the new icon
+  echo ""
+  echo "=================================================="
+  echo "   FileWhisper is installed!"
+  echo "=================================================="
+  echo ""
+  echo "  Double-click  \"FileWhisper\"  on your Desktop to start."
+  echo "  It opens automatically in your web browser - no Terminal window."
+  echo "  To stop it: right-click the FileWhisper icon in the Dock -> Quit."
+  echo ""
 
-echo ""
-echo "=================================================="
-echo "   FileWhisper is installed!"
-echo "=================================================="
-echo ""
-echo "  Double-click  \"FileWhisper\"  on your Desktop to start."
-echo "  It opens automatically in your web browser — no Terminal window."
-echo "  To stop it: right-click the FileWhisper icon in the Dock -> Quit."
-echo ""
+else
+  # 5b. Linux: create .desktop launchers (no terminal) + an app-menu entry.
+  echo "-> Creating the FileWhisper launchers..."
+  START_SH="$APP_DIR/filewhisper-start.sh"
+  STOP_SH="$APP_DIR/filewhisper-stop.sh"
+
+  cat > "$START_SH" <<EOF
+#!/bin/bash
+cd "$APP_DIR"
+exec "$VENV/bin/python" -m filewhisper.server_launcher >> "$HOME/.filewhisper/filewhisper.log" 2>&1
+EOF
+  chmod +x "$START_SH"
+
+  cat > "$STOP_SH" <<EOF
+#!/bin/bash
+PID_FILE="$HOME/.filewhisper/filewhisper.pid"
+[ -f "\$PID_FILE" ] && kill "\$(cat "\$PID_FILE")" 2>/dev/null
+EOF
+  chmod +x "$STOP_SH"
+
+  mkdir -p "$HOME/.local/share/applications" "$HOME/Desktop"
+  write_desktop() {  # name, comment, exec, outfile
+    cat > "$4" <<EOF
+[Desktop Entry]
+Type=Application
+Name=$1
+Comment=$2
+Exec=$3
+Path=$APP_DIR
+Icon=$LOGO_PNG
+Terminal=false
+Categories=Utility;Office;
+EOF
+    chmod +x "$4" 2>/dev/null || true
+    gio set "$4" metadata::trusted true 2>/dev/null || true
+  }
+  write_desktop "FileWhisper" "Chat with your local files" "$START_SH" "$HOME/.local/share/applications/filewhisper.desktop"
+  write_desktop "FileWhisper" "Chat with your local files" "$START_SH" "$HOME/Desktop/FileWhisper.desktop"
+  write_desktop "Stop FileWhisper" "Stop FileWhisper" "$STOP_SH" "$HOME/Desktop/Stop FileWhisper.desktop"
+
+  echo ""
+  echo "=================================================="
+  echo "   FileWhisper is installed!"
+  echo "=================================================="
+  echo ""
+  echo "  Double-click  \"FileWhisper\"  on your Desktop to start."
+  echo "  (On the first launch you may need to right-click -> Allow Launching.)"
+  echo "  It opens in your web browser - no terminal window."
+  echo "  To stop it, use the \"Stop FileWhisper\" launcher."
+  echo ""
+fi

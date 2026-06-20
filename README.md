@@ -15,19 +15,19 @@ The app indexes local documents, retrieves relevant chunks with FAISS, and answe
 - Local FAISS vector search with ONNX MiniLM embeddings (fast, ~400 MB install, no PyTorch).
 - Optional providers: Groq, OpenAI, Claude, Gemini, or any custom OpenAI-compatible API.
 
-## Install (macOS)
+## Install (macOS & Linux)
 
-For non-technical users — no Git, Node, or Rust required. Open the **Terminal** app and paste this single line:
+For non-technical users — no Git, Node, or Rust required. Open a **Terminal** and paste this single line:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ishankanodia/server_rag/main/install.sh | bash
 ```
 
-This downloads FileWhisper, builds a small isolated environment (~400 MB, no PyTorch), pre-loads the local AI models, and drops a **FileWhisper** icon on your Desktop. After that, just **double-click FileWhisper** — it opens in your web browser. You never need Terminal again.
+This downloads FileWhisper, builds a small isolated environment (~400 MB, no PyTorch), pre-loads the local AI models, and drops a **FileWhisper** launcher on your Desktop (a `.app` on macOS, a `.desktop` entry on Linux). After that, just **double-click FileWhisper** — it opens in your web browser with no terminal window. You never need Terminal again.
 
 Everything runs locally. The built-in free assistant means you don't even need an API key; paste one in **LLM Settings** only if you prefer a specific provider.
 
-> The Desktop launcher is generated on your own machine, so macOS does not flag it as an "unidentified developer" — it just opens.
+> The launcher is generated on your own machine, so macOS does not flag it as an "unidentified developer" — it just opens. (On Linux you may need to right-click the Desktop icon → **Allow Launching** the first time.)
 
 ## Install (Windows 10/11)
 
