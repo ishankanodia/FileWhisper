@@ -1,10 +1,28 @@
+import atexit
 import os
 import socket
 import threading
 import time
 import webbrowser
+from pathlib import Path
 
 import uvicorn
+
+
+def _pid_file() -> Path:
+    base = os.getenv("FILEWHISPER_HOME") or os.path.join(os.path.expanduser("~"), ".filewhisper")
+    return Path(base) / "filewhisper.pid"
+
+
+def _write_pid_file():
+    """Record this process's PID so a 'Stop' shortcut can terminate it cleanly."""
+    try:
+        path = _pid_file()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(str(os.getpid()))
+        atexit.register(lambda: path.unlink(missing_ok=True))
+    except Exception:
+        pass  # PID file is a convenience; never block startup over it
 
 
 def find_free_port(start: int = 8001, end: int = 8100) -> int:
@@ -50,6 +68,8 @@ def main():
 
     # Launch browser thread
     threading.Thread(target=open_browser, daemon=True).start()
+
+    _write_pid_file()
 
     print("\n" + "=" * 60)
     print("  FileWhisper is starting...")

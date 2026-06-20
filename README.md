@@ -29,6 +29,16 @@ Everything runs locally. The built-in free assistant means you don't even need a
 
 > The Desktop launcher is generated on your own machine, so macOS does not flag it as an "unidentified developer" — it just opens.
 
+## Install (Windows 10/11)
+
+Open **PowerShell** and paste this one line:
+
+```powershell
+irm https://raw.githubusercontent.com/ishankanodia/server_rag/main/install.ps1 | iex
+```
+
+It installs Python if needed (via winget), sets up the same small isolated environment, and puts **FileWhisper** and **Stop FileWhisper** shortcuts (with the logo) on your Desktop. Double-click **FileWhisper** to start — it opens in your browser with **no console window** — and **Stop FileWhisper** to stop it.
+
 ### For Developers
 
 Developers can clone the repo and run the app locally from Terminal.
