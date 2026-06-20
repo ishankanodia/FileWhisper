@@ -128,6 +128,8 @@ exec "$VENV/bin/python" -m filewhisper.server_launcher >> "$HOME/.filewhisper/fi
 EOF
   chmod +x "$APP_BUNDLE/Contents/MacOS/FileWhisper"
   touch "$APP_BUNDLE"
+  # Register with LaunchServices so the custom icon shows right away.
+  /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP_BUNDLE" 2>/dev/null || true
 
   echo ""
   echo "=================================================="
