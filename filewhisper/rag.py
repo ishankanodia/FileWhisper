@@ -110,13 +110,24 @@ def _load():
 _load()
 
 
-def split_text(text, chunk_size=150):
+def split_text(text, chunk_size=140, overlap=40):
+    """Split text into overlapping word windows.
+
+    Overlap keeps short structured data (flight rows, names, PNRs) from being
+    cut across a chunk boundary, which improves retrieval of specifics.
+    """
     words = text.split()
-    return [
-        " ".join(words[i:i + chunk_size])
-        for i in range(0, len(words), chunk_size)
-        if words[i:i + chunk_size]
-    ]
+    if not words:
+        return []
+    step = max(1, chunk_size - overlap)
+    chunks = []
+    for i in range(0, len(words), step):
+        piece = words[i:i + chunk_size]
+        if piece:
+            chunks.append(" ".join(piece))
+        if i + chunk_size >= len(words):
+            break
+    return chunks
 
 
 def extract_text_from_file(filepath: str) -> str:
@@ -253,7 +264,7 @@ def ingest_path(path: str) -> dict:
     }
 
 
-def retrieve(query: str, k: int = 5) -> list:
+def retrieve(query: str, k: int = 8) -> list:
     """Returns list of (chunk_text, source_filepath) tuples."""
     global index, documents, doc_sources
 

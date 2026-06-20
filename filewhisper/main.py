@@ -179,6 +179,8 @@ def public_llm_config() -> dict:
 def clean_text(text: str) -> str:
     # Strip Markdown link syntax [text](url) -> text, but keep plain [brackets]
     text = re.sub(r'\[([^\]]*)\]\([^)]*\)', r'\1', text)
+    # Remove Markdown bold markers some models emit despite instructions
+    text = text.replace('**', '')
     text = text.encode("ascii", "ignore").decode()
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
@@ -410,14 +412,15 @@ def answer_node(state: GraphState):
         return {}
 
     prompt = f"""
-You are a helpful research assistant.
+You are a precise document assistant. Answer the question using ONLY the context below.
 
-Answer ONLY using the context below. Be structured and clear.
-
-Format:
-- Use bullet points for lists
-- Keep it concise but complete
-- No markdown bold (**)
+Guidelines:
+- Pull out concrete specifics when they appear: names, dates, times, places, routes, flight/PNR/booking/reference numbers, amounts, and statuses.
+- If the context contains several records (e.g. multiple tickets or files), list each one separately so they are easy to compare.
+- Prefer the specific details in the documents over generic terms, instructions, or boilerplate.
+- Use short bullet points. Be concise but complete.
+- Do not use markdown bold or asterisks.
+- If the answer is not in the context, say so plainly instead of guessing.
 
 Context:
 {state['context']}
