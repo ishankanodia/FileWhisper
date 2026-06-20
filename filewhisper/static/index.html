@@ -390,10 +390,26 @@
     .chat-bubble.assistant strong { color: var(--text); }
 
     .answer-box-content {
-      white-space: pre-wrap;
       word-wrap: break-word;
       overflow-wrap: break-word;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
     }
+    .answer-box-content .ans-line { white-space: pre-wrap; }
+    .answer-box-content .ans-line:empty { height: 5px; }
+    .answer-box-content .ans-bullet {
+      display: flex;
+      gap: 9px;
+      align-items: baseline;
+    }
+    .answer-box-content .ans-dot {
+      color: var(--accent);
+      flex-shrink: 0;
+      font-size: 0.7em;
+      transform: translateY(-1px);
+    }
+    .answer-box-content .ans-btext { flex: 1; white-space: pre-wrap; }
 
     .sources-label {
       font-family: 'IBM Plex Mono', monospace;
@@ -992,16 +1008,57 @@
 
     function typeText(el, text, speed=10, cb=null) {
       el.textContent = ""; let i = 0;
-      function go() { 
-        if (i < text.length) { 
-          el.textContent += text.charAt(i++); 
+      function go() {
+        if (i < text.length) {
+          el.textContent += text.charAt(i++);
           if (cb) cb();
-          setTimeout(go, speed); 
+          setTimeout(go, speed);
         } else if (cb) {
           cb();
         }
       }
       go();
+    }
+
+    // Render an answer as stacked lines, turning "- "/"* "/"• " markers into
+    // proper bullets with a hanging indent. Types content in for a live feel.
+    function typeFormatted(el, text, speed=6, onTick=null, onDone=null) {
+      el.innerHTML = "";
+      const lines = (text || "").split("\n");
+      let li = 0;
+      function nextLine() {
+        if (li >= lines.length) { if (onDone) onDone(); return; }
+        const raw = lines[li].replace(/\s+$/, "");
+        const m = raw.match(/^\s*[-•*]\s+(.*)$/);
+        const div = document.createElement("div");
+        let target;
+        if (m) {
+          div.className = "ans-bullet";
+          const dot = document.createElement("span");
+          dot.className = "ans-dot"; dot.textContent = "●";
+          target = document.createElement("span");
+          target.className = "ans-btext";
+          div.appendChild(dot); div.appendChild(target);
+        } else {
+          div.className = "ans-line";
+          target = div;
+        }
+        el.appendChild(div);
+        const content = m ? m[1] : raw;
+        let ci = 0;
+        function typeChar() {
+          if (ci < content.length) {
+            target.textContent += content.charAt(ci++);
+            if (onTick) onTick();
+            setTimeout(typeChar, speed);
+          } else {
+            li++;
+            setTimeout(nextLine, speed);
+          }
+        }
+        if (content.length === 0) { li++; nextLine(); } else { typeChar(); }
+      }
+      nextLine();
     }
 
     document.getElementById("question").addEventListener("keydown", e => {
@@ -1068,9 +1125,27 @@
         const res = await fetch(`${BASE}/ask`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({question}) });
         const data = await res.json();
 
-        typeText(answerBox, data.answer || "No answer returned.", 8, () => {
-          chatScroll.scrollTop = chatScroll.scrollHeight;
-        });
+        const showFollowUp = () => {
+          if (!data.follow_up) return;
+          followupBox.style.display = "block";
+          followupBox.style.cursor = "pointer";
+          followupBox.title = "Click to ask this question";
+          typeText(followupBox, "💡 " + data.follow_up, 14, () => {
+            chatScroll.scrollTop = chatScroll.scrollHeight;
+          });
+          followupBox.onclick = () => {
+            document.getElementById("question").value = data.follow_up;
+            document.getElementById("askBtn").click();
+          };
+        };
+
+        typeFormatted(
+          answerBox,
+          data.answer || "No answer returned.",
+          6,
+          () => { chatScroll.scrollTop = chatScroll.scrollHeight; },
+          () => { setTimeout(showFollowUp, 200); }
+        );
 
         // Show source file tags
         if (data.sources && data.sources.length) {
@@ -1083,21 +1158,6 @@
             sourcesUsed.appendChild(tag);
           });
           chatScroll.scrollTop = chatScroll.scrollHeight;
-        }
-
-        if (data.follow_up) {
-          setTimeout(() => {
-            followupBox.style.display = "block";
-            followupBox.style.cursor = "pointer";
-            followupBox.title = "Click to ask this question";
-            typeText(followupBox, "💡 " + data.follow_up, 14, () => {
-              chatScroll.scrollTop = chatScroll.scrollHeight;
-            });
-            followupBox.onclick = () => {
-              document.getElementById("question").value = data.follow_up;
-              document.getElementById("askBtn").click();
-            };
-          }, (data.answer?.length || 0) * 8 + 300);
         }
       } catch(e) { 
         answerBox.innerText = "❌ Error: Backend not reachable."; 
