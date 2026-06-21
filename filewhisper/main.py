@@ -8,6 +8,8 @@ from .rag import ingest_path, retrieve, get_indexed_sources, clear_index
 import json
 import re
 import os
+import threading
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -181,6 +183,20 @@ def clean_text(text: str) -> str:
     text = re.sub(r'\[([^\]]*)\]\([^)]*\)', r'\1', text)
     # Remove Markdown bold markers some models emit despite instructions
     text = text.replace('**', '')
+    # Normalize "smart"/typographic punctuation to plain ASCII. Done BEFORE the
+    # ascii-strip below so apostrophes, quotes and dashes survive and words are
+    # never glued together (e.g. "IIM<NBSP>Indore<U+2019>s" -> "IIMIndores").
+    _PUNCT = {
+        '‘': "'", '’': "'", '‚': "'", '‛': "'",   # single quotes
+        '“': '"', '”': '"', '„': '"', '‟': '"',   # double quotes
+        '–': '-', '—': '-', '‒': '-', '―': '-',   # dashes
+        '…': '...',                                              # ellipsis
+        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',   # non-breaking/thin spaces
+        '​': '', '‌': '', '‍': '', '﻿': '',       # zero-width chars
+        '´': "'", '`': "'",                                  # stray accents used as quotes
+    }
+    for _k, _v in _PUNCT.items():
+        text = text.replace(_k, _v)
     text = text.encode("ascii", "ignore").decode()
 
     # Safety net: if the model ignores the instruction and returns a bullet or
@@ -518,6 +534,25 @@ def serve_ui():
 
 @app.get("/health")
 def health():
+    return {"status": "ok"}
+
+
+@app.post("/shutdown")
+def shutdown():
+    """Stop the FileWhisper server. Used by the in-app Quit button so users
+    have one way to stop it on every OS (no separate "Stop" desktop app)."""
+    base = Path(os.getenv("FILEWHISPER_HOME") or (Path.home() / ".filewhisper"))
+    for name in ("filewhisper.pid", "filewhisper.port"):
+        try:
+            (base / name).unlink()
+        except OSError:
+            pass
+
+    def _stop():
+        time.sleep(0.3)  # let this response flush to the browser first
+        os._exit(0)
+
+    threading.Thread(target=_stop, daemon=True).start()
     return {"status": "ok"}
 
 

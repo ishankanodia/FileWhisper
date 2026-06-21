@@ -1,6 +1,7 @@
 import atexit
 import os
 import socket
+import sys
 import threading
 import time
 import urllib.request
@@ -13,6 +14,28 @@ import uvicorn
 def _state_dir() -> Path:
     base = os.getenv("FILEWHISPER_HOME") or os.path.join(os.path.expanduser("~"), ".filewhisper")
     return Path(base)
+
+
+def _ensure_output_streams():
+    """Guarantee sys.stdout/sys.stderr are real, writable streams.
+
+    On Windows the Desktop shortcut launches us with pythonw.exe (no console),
+    where sys.stdout and sys.stderr are None. uvicorn's log formatter calls
+    sys.stdout.isatty() while starting up, which then raises AttributeError and
+    the server never starts - the app looks like it "won't open". Point the
+    missing streams at the log file so the server runs and we still get logs.
+    """
+    if sys.stdout is not None and sys.stderr is not None:
+        return
+    try:
+        _state_dir().mkdir(parents=True, exist_ok=True)
+        log = open(_state_dir() / "filewhisper.log", "a", buffering=1, encoding="utf-8")
+    except Exception:
+        log = open(os.devnull, "w")
+    if sys.stdout is None:
+        sys.stdout = log
+    if sys.stderr is None:
+        sys.stderr = log
 
 
 def _pid_file() -> Path:
@@ -82,6 +105,10 @@ def get_local_ip() -> str:
 
 
 def main():
+    # Must run before anything prints or uvicorn starts: on Windows (pythonw)
+    # there is no console, so stdout/stderr are None and uvicorn would crash.
+    _ensure_output_streams()
+
     # If FileWhisper is already running, just reopen it instead of starting
     # a second server (e.g. when the Desktop icon is double-clicked again).
     existing = _existing_port()
@@ -104,9 +131,19 @@ def main():
     local_ip = get_local_ip()
 
     def open_browser():
-        time.sleep(1.5)
+        # Wait until the server actually answers before opening the browser, so
+        # a slow cold start (model/onnx imports) doesn't open a dead page.
+        url = f"http://127.0.0.1:{port}"
+        for _ in range(60):  # up to ~30s
+            try:
+                with urllib.request.urlopen(f"{url}/health", timeout=1) as resp:
+                    if resp.status == 200:
+                        break
+            except Exception:
+                pass
+            time.sleep(0.5)
         try:
-            webbrowser.open(f"http://127.0.0.1:{port}")
+            webbrowser.open(url)
         except Exception as e:
             print(f"Could not open browser automatically: {e}")
 

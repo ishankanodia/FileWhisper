@@ -16,7 +16,6 @@ try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocol]::Tls1
 $Repo    = "ishankanodia/FileWhisper"
 $Branch  = "main"
 $AppDir  = Join-Path $env:USERPROFILE ".filewhisper\app"
-$PidFile = Join-Path $env:USERPROFILE ".filewhisper\filewhisper.pid"
 $Desktop = [Environment]::GetFolderPath("Desktop")
 
 Write-Host ""
@@ -82,10 +81,11 @@ Write-Host "-> Preparing the local AI models..."
 & $VenvPy -c "from fastembed import TextEmbedding; list(TextEmbedding('sentence-transformers/all-MiniLM-L6-v2').embed(['warmup'])); print('   embeddings ready')"
 try { & $VenvPy -c "from rapidocr_onnxruntime import RapidOCR; RapidOCR(); print('   OCR ready')" } catch { Write-Host "   (OCR warmup skipped)" }
 
-# 5. Hidden launchers (VBScript runs pythonw with no console window).
+# 5. Hidden launcher (VBScript runs pythonw with no console window).
+#    A stale shortcut from older installs is removed so only one app remains.
 $Logo     = Join-Path $AppDir "filewhisper\static\logo.ico"
 $VbsStart = Join-Path $AppDir "FileWhisper.vbs"
-$VbsStop  = Join-Path $AppDir "StopFileWhisper.vbs"
+Remove-Item (Join-Path $Desktop "Stop FileWhisper.lnk") -ErrorAction SilentlyContinue
 
 @"
 Set sh = CreateObject("WScript.Shell")
@@ -93,12 +93,7 @@ sh.CurrentDirectory = "$AppDir"
 sh.Run """$VenvPyw"" -m filewhisper.server_launcher", 0, False
 "@ | Set-Content -Encoding ASCII -Path $VbsStart
 
-@"
-Set sh = CreateObject("WScript.Shell")
-sh.Run "powershell -NoProfile -WindowStyle Hidden -Command ""if (Test-Path '$PidFile') { Stop-Process -Id (Get-Content '$PidFile') -Force -ErrorAction SilentlyContinue }""", 0, True
-"@ | Set-Content -Encoding ASCII -Path $VbsStop
-
-# 6. Desktop shortcuts with the logo icon.
+# 6. Single Desktop shortcut with the logo icon.
 $ws = New-Object -ComObject WScript.Shell
 
 $lnk = $ws.CreateShortcut((Join-Path $Desktop "FileWhisper.lnk"))
@@ -109,13 +104,6 @@ $lnk.IconLocation     = "$Logo,0"
 $lnk.Description       = "FileWhisper - chat with your local files"
 $lnk.Save()
 
-$lnk2 = $ws.CreateShortcut((Join-Path $Desktop "Stop FileWhisper.lnk"))
-$lnk2.TargetPath   = "wscript.exe"
-$lnk2.Arguments    = """$VbsStop"""
-$lnk2.IconLocation = "$Logo,0"
-$lnk2.Description   = "Stop FileWhisper"
-$lnk2.Save()
-
 Write-Host ""
 Write-Host "=================================================="
 Write-Host "   FileWhisper is installed!"
@@ -123,5 +111,5 @@ Write-Host "=================================================="
 Write-Host ""
 Write-Host "  Double-click  'FileWhisper'  on your Desktop to start."
 Write-Host "  It opens in your web browser - no console window."
-Write-Host "  To stop it, double-click  'Stop FileWhisper'."
+Write-Host "  To stop it, click  'Quit FileWhisper'  inside the app."
 Write-Host ""

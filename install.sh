@@ -142,10 +142,9 @@ EOF
   echo ""
 
 else
-  # 5b. Linux: create .desktop launchers (no terminal) + an app-menu entry.
-  echo "-> Creating the FileWhisper launchers..."
+  # 5b. Linux: create a .desktop launcher (no terminal) + an app-menu entry.
+  echo "-> Creating the FileWhisper launcher..."
   START_SH="$APP_DIR/filewhisper-start.sh"
-  STOP_SH="$APP_DIR/filewhisper-stop.sh"
 
   cat > "$START_SH" <<EOF
 #!/bin/bash
@@ -154,12 +153,9 @@ exec "$VENV/bin/python" -m filewhisper.server_launcher >> "$HOME/.filewhisper/fi
 EOF
   chmod +x "$START_SH"
 
-  cat > "$STOP_SH" <<EOF
-#!/bin/bash
-PID_FILE="$HOME/.filewhisper/filewhisper.pid"
-[ -f "\$PID_FILE" ] && kill "\$(cat "\$PID_FILE")" 2>/dev/null
-EOF
-  chmod +x "$STOP_SH"
+  # Remove a stale "Stop" launcher from older installs - quitting is now done
+  # from inside the app, so there is only one FileWhisper launcher.
+  rm -f "$HOME/Desktop/Stop FileWhisper.desktop"
 
   mkdir -p "$HOME/.local/share/applications" "$HOME/Desktop"
   write_desktop() {  # name, comment, exec, outfile
@@ -179,7 +175,6 @@ EOF
   }
   write_desktop "FileWhisper" "Chat with your local files" "$START_SH" "$HOME/.local/share/applications/filewhisper.desktop"
   write_desktop "FileWhisper" "Chat with your local files" "$START_SH" "$HOME/Desktop/FileWhisper.desktop"
-  write_desktop "Stop FileWhisper" "Stop FileWhisper" "$STOP_SH" "$HOME/Desktop/Stop FileWhisper.desktop"
 
   echo ""
   echo "=================================================="
@@ -189,6 +184,6 @@ EOF
   echo "  Double-click  \"FileWhisper\"  on your Desktop to start."
   echo "  (On the first launch you may need to right-click -> Allow Launching.)"
   echo "  It opens in your web browser - no terminal window."
-  echo "  To stop it, use the \"Stop FileWhisper\" launcher."
+  echo "  To stop it, click  \"Quit FileWhisper\"  inside the app."
   echo ""
 fi

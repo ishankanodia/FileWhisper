@@ -634,6 +634,20 @@
         </div>
       </div>
 
+      <!-- Quit -->
+      <div class="sidebar-section">
+        <div id="quitWrap">
+          <button class="btn btn-red" id="quitBtn">⏻ Quit FileWhisper</button>
+          <div class="confirm-inline" id="quitConfirm" style="display:none;">
+            <div class="confirm-msg">Quit FileWhisper? This stops the local server.</div>
+          </div>
+          <div class="confirm-inline" id="quitActions" style="display:none;">
+            <button class="btn btn-red" id="quitYes">Yes, Quit</button>
+            <button class="btn btn-cyan" id="quitNo">Cancel</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </aside>
 
@@ -908,6 +922,25 @@
       document.getElementById("clearConfirm").style.display = "none";
       document.getElementById("clearActions").style.display = "none";
       loadSources();
+    };
+
+    document.getElementById("quitBtn").onclick = () => {
+      document.getElementById("quitBtn").style.display = "none";
+      document.getElementById("quitConfirm").style.display = "flex";
+      document.getElementById("quitActions").style.display = "flex";
+    };
+    document.getElementById("quitNo").onclick = () => {
+      document.getElementById("quitBtn").style.display = "";
+      document.getElementById("quitConfirm").style.display = "none";
+      document.getElementById("quitActions").style.display = "none";
+    };
+    document.getElementById("quitYes").onclick = async () => {
+      try { await fetch(`${BASE}/shutdown`, { method: "POST" }); } catch (e) {}
+      document.body.innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:center;' +
+        'height:100vh;font-family:inherit;color:#a1a1aa;text-align:center;padding:24px;">' +
+        '<div><div style="font-size:1.3rem;color:#e4e4e7;margin-bottom:8px;">FileWhisper has stopped.</div>' +
+        '<div>You can close this tab. Double-click FileWhisper on your Desktop to start it again.</div></div></div>';
     };
 
     function applyProviderDefaults() {
