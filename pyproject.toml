@@ -7,7 +7,8 @@ name = "filewhisper"
 version = "0.1.0"
 description = "Local RAG document assistant server with keyless LLM support."
 readme = "README.md"
-requires-python = ">=3.9"
+# Upper bound: fastembed needs >=3.10; rapidocr/onnxruntime don't support 3.14+ yet.
+requires-python = ">=3.10,<3.14"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",

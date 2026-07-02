@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from .rag import ingest_path, retrieve, get_indexed_sources, clear_index
 
@@ -22,12 +21,10 @@ load_dotenv()
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# NOTE: no CORS middleware on purpose. The UI is served from this same origin
+# (index.html uses window.location.origin), so cross-origin access is never
+# needed — and allowing it would let any webpage the user visits read /browse,
+# query their documents, or rewrite /llm-config to exfiltrate their API key.
 
 PACKAGE_DIR = Path(__file__).parent
 STATIC_DIR = PACKAGE_DIR / "static"
@@ -145,6 +142,10 @@ def _save_llm_config():
         "api_keys": {name: key for name, key in llm_config["api_keys"].items() if key},
     }
     path.write_text(json.dumps(payload, indent=2))
+    try:
+        os.chmod(path, 0o600)  # the file holds plaintext API keys
+    except OSError:
+        pass
 
 
 def _normalize_provider(provider: str) -> str:
@@ -184,9 +185,9 @@ def clean_text(text: str) -> str:
     text = re.sub(r'\[([^\]]*)\]\([^)]*\)', r'\1', text)
     # Remove Markdown bold markers some models emit despite instructions
     text = text.replace('**', '')
-    # Normalize "smart"/typographic punctuation to plain ASCII. Done BEFORE the
-    # ascii-strip below so apostrophes, quotes and dashes survive and words are
-    # never glued together (e.g. "IIM<NBSP>Indore<U+2019>s" -> "IIMIndores").
+    # Normalize "smart"/typographic punctuation to plain ASCII equivalents and
+    # drop zero-width characters. Everything else (Hindi, Chinese, accented
+    # names, ...) is kept as-is — answers must survive in any language.
     _PUNCT = {
         '‘': "'", '’': "'", '‚': "'", '‛': "'",   # single quotes
         '“': '"', '”': '"', '„': '"', '‟': '"',   # double quotes
@@ -198,7 +199,6 @@ def clean_text(text: str) -> str:
     }
     for _k, _v in _PUNCT.items():
         text = text.replace(_k, _v)
-    text = text.encode("ascii", "ignore").decode()
 
     # Safety net: if the model ignores the instruction and returns a bullet or
     # numbered list, merge each run of list items back into a flowing sentence
@@ -255,17 +255,25 @@ def _post_json(url: str, payload: dict, headers: dict, timeout: int = 60) -> dic
 
 
 def _call_openai_compatible(cfg: dict, prompt: str, max_tokens: int) -> str:
+    payload = {
+        "model": cfg["model"],
+        "messages": [
+            {"role": "system", "content": "Answer ONLY using provided context. Be structured and clear."},
+            {"role": "user", "content": prompt}
+        ],
+    }
+    # Newer OpenAI models (gpt-5 family, o-series reasoning models) reject
+    # `max_tokens` (they take `max_completion_tokens`) and any non-default
+    # temperature. Older models and other OpenAI-compatible providers (Groq,
+    # custom) still use the classic parameters.
+    if re.match(r"(gpt-5|o\d)", cfg["model"]):
+        payload["max_completion_tokens"] = max_tokens
+    else:
+        payload["max_tokens"] = max_tokens
+        payload["temperature"] = 0.5
     data = _post_json(
         f"{cfg['base_url']}/chat/completions",
-        {
-            "model": cfg["model"],
-            "messages": [
-                {"role": "system", "content": "Answer ONLY using provided context. Be structured and clear."},
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.5,
-            "max_tokens": max_tokens,
-        },
+        payload,
         {"Authorization": f"Bearer {cfg['api_key']}"},
     )
     return data["choices"][0]["message"]["content"].strip()
@@ -292,7 +300,9 @@ def _call_anthropic(cfg: dict, prompt: str, max_tokens: int) -> str:
 def _call_gemini(cfg: dict, prompt: str, max_tokens: int) -> str:
     model = cfg["model"].removeprefix("models/")
     data = _post_json(
-        f"{cfg['base_url']}/models/{model}:generateContent?key={cfg['api_key']}",
+        # Key goes in the x-goog-api-key header, not the URL, so it can't leak
+        # into proxy/server logs.
+        f"{cfg['base_url']}/models/{model}:generateContent",
         {
             "systemInstruction": {
                 "parts": [{"text": "Answer ONLY using provided context. Be structured and clear."}]
@@ -308,7 +318,7 @@ def _call_gemini(cfg: dict, prompt: str, max_tokens: int) -> str:
                 "maxOutputTokens": max_tokens,
             },
         },
-        {},
+        {"x-goog-api-key": cfg["api_key"]},
     )
     candidates = data.get("candidates", [])
     if not candidates:
@@ -349,7 +359,13 @@ def _call_pollinations(prompt: str) -> str:
             last_err = e
 
     try:
-        url = "https://text.pollinations.ai/" + urllib.parse.quote(prompt[:1800])
+        # GET fallback: the prompt travels in the URL, so very long contexts
+        # must be trimmed. Keep the head (instructions) and the tail (end of
+        # context + the question) rather than blindly cutting at the front.
+        MAX_GET = 6000
+        if len(prompt) > MAX_GET:
+            prompt = prompt[:2000] + "\n...\n" + prompt[-(MAX_GET - 2000):]
+        url = "https://text.pollinations.ai/" + urllib.parse.quote(prompt)
         req = urllib.request.Request(url, headers={"User-Agent": ua, "Accept": "*/*"})
         with urllib.request.urlopen(req, timeout=60) as response:
             text = response.read().decode("utf-8").strip()
@@ -538,7 +554,19 @@ def serve_ui():
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    # "app" lets the launcher confirm a port really belongs to FileWhisper and
+    # not some other local server that happened to reuse it.
+    return {"status": "ok", "app": "filewhisper"}
+
+
+def _local_fs_disabled() -> bool:
+    """True when browsing/ingesting the server's own filesystem is disabled.
+
+    Set FILEWHISPER_DISABLE_BROWSE=1 in hosted deployments (Dockerfile and
+    Procfile do) — otherwise anyone reaching the app can list the server's
+    directories and index its files.
+    """
+    return os.getenv("FILEWHISPER_DISABLE_BROWSE", "").strip().lower() in ("1", "true", "yes")
 
 
 @app.post("/shutdown")
@@ -563,6 +591,8 @@ def shutdown():
 @app.get("/browse")
 def browse(path: str = ""):
     """Return contents of a directory for the folder picker UI."""
+    if _local_fs_disabled():
+        raise HTTPException(status_code=403, detail="Filesystem browsing is disabled on this deployment.")
     if not path:
         path = str(Path.home())
     path = os.path.abspath(path)
@@ -600,6 +630,8 @@ def browse(path: str = ""):
 
 @app.post("/ingest")
 def ingest(req: IngestRequest):
+    if _local_fs_disabled():
+        raise HTTPException(status_code=403, detail="Filesystem ingestion is disabled on this deployment.")
     path = req.path.strip()
     if not os.path.exists(path):
         raise HTTPException(status_code=400, detail=f"Path does not exist: {path}")

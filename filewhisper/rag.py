@@ -3,6 +3,7 @@ import numpy as np
 import os
 import json
 import pickle
+import threading
 
 # PDF text extraction (lightweight, no PyTorch)
 import fitz  # PyMuPDF
@@ -78,6 +79,10 @@ doc_sources = []  # parallel list: one source path per chunk
 sources = []      # unique list of ingested file paths
 index = None
 
+# FAISS and the parallel lists are not thread-safe; FastAPI serves requests on a
+# thread pool, so concurrent /ingest and /ask must not mutate them unguarded.
+_lock = threading.RLock()
+
 
 def _save():
     global index, documents, doc_sources, sources
@@ -85,7 +90,7 @@ def _save():
         faiss.write_index(index, INDEX_PATH)
     with open(DOCS_PATH, "wb") as f:
         pickle.dump((documents, doc_sources), f)
-    with open(SOURCES_PATH, "w") as f:
+    with open(SOURCES_PATH, "w", encoding="utf-8") as f:
         json.dump(sources, f)
 
 
@@ -102,7 +107,7 @@ def _load():
                 documents = loaded
                 doc_sources = ["unknown"] * len(documents)
     if os.path.exists(SOURCES_PATH):
-        with open(SOURCES_PATH, "r") as f:
+        with open(SOURCES_PATH, "r", encoding="utf-8") as f:
             sources = json.load(f)
 
 
@@ -214,17 +219,18 @@ def add_chunks(chunks: list, source_path: str):
     embeddings = _embed(chunks)
     dimension = embeddings.shape[1]
 
-    if index is None:
-        index = faiss.IndexFlatL2(dimension)
+    with _lock:
+        if index is None:
+            index = faiss.IndexFlatL2(dimension)
 
-    index.add(embeddings)
-    documents.extend(chunks)
-    doc_sources.extend([source_path] * len(chunks))  # track source per chunk
+        index.add(embeddings)
+        documents.extend(chunks)
+        doc_sources.extend([source_path] * len(chunks))  # track source per chunk
 
-    if source_path not in sources:
-        sources.append(source_path)
+        if source_path not in sources:
+            sources.append(source_path)
 
-    _save()
+        _save()
     return len(chunks)
 
 
@@ -245,8 +251,15 @@ def ingest_path(path: str) -> dict:
     else:
         return {"error": "Invalid path"}
 
+    # Compare normalized paths so the same file reached with different casing or
+    # slashes (common on Windows) isn't indexed twice.
+    def _norm(p: str) -> str:
+        return os.path.normcase(os.path.normpath(p))
+
+    indexed = {_norm(s) for s in sources}
+
     for filepath in files:
-        if filepath in sources:
+        if _norm(filepath) in indexed:
             results.append({"file": filepath, "status": "skipped", "chunks": 0, "reason": "already indexed"})
             continue
         text = extract_text_from_file(filepath)
@@ -272,11 +285,14 @@ def retrieve(query: str, k: int = 8) -> list:
         return []
 
     query_embedding = _embed([query])
-    distances, indices = index.search(query_embedding, k)
-    return [
-        (documents[i], doc_sources[i])
-        for i in indices[0] if i < len(documents)
-    ]
+    with _lock:
+        distances, indices = index.search(query_embedding, k)
+        # FAISS pads with -1 when the index holds fewer than k vectors; a plain
+        # `i < len(documents)` lets -1 through and wraps to the last chunk.
+        return [
+            (documents[i], doc_sources[i])
+            for i in indices[0] if 0 <= i < len(documents)
+        ]
 
 
 def get_indexed_sources() -> list:
@@ -285,10 +301,11 @@ def get_indexed_sources() -> list:
 
 def clear_index():
     global index, documents, doc_sources, sources
-    index = None
-    documents = []
-    doc_sources = []
-    sources = []
-    for path in [INDEX_PATH, DOCS_PATH, SOURCES_PATH]:
-        if os.path.exists(path):
-            os.remove(path)
+    with _lock:
+        index = None
+        documents = []
+        doc_sources = []
+        sources = []
+        for path in [INDEX_PATH, DOCS_PATH, SOURCES_PATH]:
+            if os.path.exists(path):
+                os.remove(path)

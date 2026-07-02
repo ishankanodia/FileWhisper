@@ -45,22 +45,51 @@ echo "   Installing FileWhisper"
 echo "=================================================="
 echo ""
 
-# 1. Make sure Python 3 is available.
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "Python 3 is needed but was not found."
+# 1. Find a Python between 3.10 and 3.13. The AI libraries (fastembed,
+#    rapidocr, faiss) don't support 3.14+ yet, and fastembed needs 3.10+.
+find_python() {
+  for cand in python3.12 python3.11 python3.10 python3.13 python3; do
+    if command -v "$cand" >/dev/null 2>&1; then
+      if "$cand" -c 'import sys; sys.exit(0 if (3,10) <= sys.version_info[:2] <= (3,13) else 1)' 2>/dev/null; then
+        command -v "$cand"
+        return 0
+      fi
+    fi
+  done
+  return 1
+}
+
+PYTHON="$(find_python || true)"
+if [ -z "$PYTHON" ] && [ "$OS" = "Darwin" ] && command -v brew >/dev/null 2>&1; then
+  echo "-> No compatible Python (3.10 - 3.13) found. Installing Python 3.12 via Homebrew..."
+  brew install python@3.12 || true
+  PYTHON="$(find_python || true)"
+fi
+if [ -z "$PYTHON" ]; then
+  echo "FileWhisper needs Python 3.10 - 3.13 (3.14+ is not supported by its AI libraries yet)."
   if [ "$OS" = "Darwin" ]; then
-    echo "A macOS install window will open - click \"Install\", let it finish,"
+    echo "Install it from https://www.python.org/downloads/ (or: brew install python@3.12),"
     echo "then run this command again."
-    xcode-select --install 2>/dev/null || true
   else
     echo "Please install it with your package manager, then run this again, e.g.:"
-    echo "  Debian/Ubuntu:  sudo apt install python3 python3-venv python3-pip"
-    echo "  Fedora:         sudo dnf install python3 python3-pip"
+    echo "  Debian/Ubuntu:  sudo apt install python3.12 python3.12-venv"
+    echo "  Fedora:         sudo dnf install python3.12"
   fi
   exit 1
 fi
 
-# 2. Get the source. FILEWHISPER_SRC lets you install from a local copy (testing);
+# 2. If FileWhisper is currently running, stop it so the reinstall below
+#    doesn't leave a stale server running old code.
+PORT_FILE="$HOME/.filewhisper/filewhisper.port"
+if [ -f "$PORT_FILE" ]; then
+  old_port="$(cat "$PORT_FILE" 2>/dev/null || true)"
+  if [ -n "$old_port" ]; then
+    curl -fsS -m 2 -X POST "http://127.0.0.1:$old_port/shutdown" >/dev/null 2>&1 || true
+    sleep 1
+  fi
+fi
+
+# 3. Get the source. FILEWHISPER_SRC lets you install from a local copy (testing);
 #    otherwise the latest version is downloaded from GitHub.
 echo "-> Downloading FileWhisper..."
 rm -rf "$APP_DIR"
@@ -77,13 +106,13 @@ else
     | tar xz -C "$APP_DIR" --strip-components=1
 fi
 
-# 3. Build an isolated environment and install dependencies (no PyTorch).
+# 4. Build an isolated environment and install dependencies (no PyTorch).
 echo "-> Setting up (downloads ~400 MB the first time, please wait)..."
-python3 -m venv "$VENV"
+"$PYTHON" -m venv "$VENV"
 "$VENV/bin/python" -m pip install --quiet --upgrade pip
 "$VENV/bin/python" -m pip install --quiet -r "$APP_DIR/requirements.txt"
 
-# 4. Pre-download the local AI models so the first question doesn't stall.
+# 5. Pre-download the local AI models so the first question doesn't stall.
 echo "-> Preparing the local AI models..."
 "$VENV/bin/python" - <<'PY' || true
 try:
@@ -103,7 +132,7 @@ PY
 LOGO_PNG="$APP_DIR/filewhisper/static/logo.png"
 
 if [ "$OS" = "Darwin" ]; then
-  # 5a. macOS: build a proper .app on the Desktop (no Terminal window, logo icon).
+  # 6a. macOS: build a proper .app on the Desktop (no Terminal window, logo icon).
   #     Generated locally, so macOS does not quarantine it -> it just opens.
   echo "-> Creating the FileWhisper app..."
   APP_BUNDLE="$HOME/Desktop/FileWhisper.app"
@@ -167,7 +196,7 @@ EOF
   echo ""
 
 else
-  # 5b. Linux: create a .desktop launcher (no terminal) + an app-menu entry.
+  # 6b. Linux: create a .desktop launcher (no terminal) + an app-menu entry.
   echo "-> Creating the FileWhisper launcher..."
   START_SH="$APP_DIR/filewhisper-start.sh"
 

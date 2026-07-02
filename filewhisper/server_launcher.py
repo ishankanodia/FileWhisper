@@ -1,4 +1,5 @@
 import atexit
+import json
 import os
 import socket
 import sys
@@ -8,12 +9,22 @@ import urllib.request
 import webbrowser
 from pathlib import Path
 
-import uvicorn
+# NOTE: uvicorn (and the app itself) are imported inside main(), after
+# _ensure_output_streams() has run. Importing them at module level means any
+# import failure under pythonw.exe (no console, stdout/stderr = None) dies
+# before we can write a log line — the app just silently "doesn't open".
 
 
 def _state_dir() -> Path:
     base = os.getenv("FILEWHISPER_HOME") or os.path.join(os.path.expanduser("~"), ".filewhisper")
     return Path(base)
+
+
+def _lan_enabled() -> bool:
+    """LAN access (phones/other devices) is opt-in. Default is localhost-only:
+    binding 0.0.0.0 exposes /browse and the user's documents to everyone on the
+    same network, and triggers the Windows Firewall popup on first launch."""
+    return os.getenv("FILEWHISPER_LAN", "").strip().lower() in ("1", "true", "yes")
 
 
 def _ensure_output_streams():
@@ -46,11 +57,25 @@ def _port_file() -> Path:
     return _state_dir() / "filewhisper.port"
 
 
+def _is_filewhisper(port: int) -> bool:
+    """True if a FileWhisper server (not just any app) answers on this port."""
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=1.5) as resp:
+            if resp.status != 200:
+                return False
+            body = json.loads(resp.read().decode("utf-8"))
+            return body.get("app") == "filewhisper"
+    except Exception:
+        return False
+
+
 def _existing_port():
     """If a FileWhisper server is already running, return its port; else None.
 
     Uses an HTTP health check (cross-platform, no os.kill) so repeat launches
-    reuse the running instance instead of spawning another server.
+    reuse the running instance instead of spawning another server. The health
+    body is verified so a stale port file pointing at some other local app
+    doesn't make us open the wrong page.
     """
     pf = _port_file()
     if not pf.exists():
@@ -59,18 +84,12 @@ def _existing_port():
         port = int(pf.read_text().strip())
     except (OSError, ValueError):
         return None
-    try:
-        with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=1.5) as resp:
-            if resp.status == 200:
-                return port
-    except Exception:
-        return None
-    return None
+    return port if _is_filewhisper(port) else None
 
 
 def _write_state(port: int):
-    """Record PID + port so the Stop shortcut can find us and repeat launches can
-    reuse the running instance. Files are cleaned up on a clean exit."""
+    """Record PID + port so repeat launches can reuse the running instance.
+    Files are cleaned up on a clean exit."""
     try:
         _state_dir().mkdir(parents=True, exist_ok=True)
         pidf, portf = _pid_file(), _port_file()
@@ -81,12 +100,12 @@ def _write_state(port: int):
         pass  # state files are a convenience; never block startup over them
 
 
-def find_free_port(start: int = 8001, end: int = 8100) -> int:
+def find_free_port(host: str, start: int = 8001, end: int = 8100) -> int:
     for port in range(start, end + 1):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             try:
-                sock.bind(("0.0.0.0", port))
+                sock.bind((host, port))
             except OSError:
                 continue
             return port
@@ -121,26 +140,34 @@ def main():
         return
 
     try:
-        from filewhisper.main import app
-    except ImportError:
-        from main import app
+        import uvicorn
+        try:
+            from filewhisper.main import app
+        except ImportError:
+            from main import app
+    except Exception:
+        # With pythonw there is no console: make sure the reason the app
+        # "won't open" ends up in the log before dying.
+        import traceback
+        print("FileWhisper failed to start:")
+        traceback.print_exc()
+        print(f"(log file: {_state_dir() / 'filewhisper.log'})")
+        raise
 
-    port = int(os.getenv("FILEWHISPER_PORT", find_free_port()))
+    lan = _lan_enabled()
+    host = "0.0.0.0" if lan else "127.0.0.1"
+
+    env_port = os.getenv("FILEWHISPER_PORT")
+    port = int(env_port) if env_port else find_free_port(host)
     os.environ["FILEWHISPER_PORT"] = str(port)
-
-    local_ip = get_local_ip()
 
     def open_browser():
         # Wait until the server actually answers before opening the browser, so
         # a slow cold start (model/onnx imports) doesn't open a dead page.
         url = f"http://127.0.0.1:{port}"
         for _ in range(60):  # up to ~30s
-            try:
-                with urllib.request.urlopen(f"{url}/health", timeout=1) as resp:
-                    if resp.status == 200:
-                        break
-            except Exception:
-                pass
+            if _is_filewhisper(port):
+                break
             time.sleep(0.5)
         try:
             webbrowser.open(url)
@@ -155,11 +182,15 @@ def main():
     print("\n" + "=" * 60)
     print("  FileWhisper is starting...")
     print(f"  Local Access:   http://127.0.0.1:{port}")
-    if local_ip != "127.0.0.1":
-        print(f"  Network Access: http://{local_ip}:{port} (For mobile / other devices on the same Wi-Fi)")
+    if lan:
+        local_ip = get_local_ip()
+        if local_ip != "127.0.0.1":
+            print(f"  Network Access: http://{local_ip}:{port} (For mobile / other devices on the same Wi-Fi)")
+    else:
+        print("  (localhost only - set FILEWHISPER_LAN=1 to allow other devices on your Wi-Fi)")
     print("=" * 60 + "\n")
 
-    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
+    uvicorn.run(app, host=host, port=port, log_level="info")
 
 
 if __name__ == "__main__":
