@@ -83,13 +83,15 @@ GROQ_API_KEY=your_key
 ```bash
 git clone https://github.com/ishankanodia/FileWhisper.git
 cd FileWhisper
-python3 -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate   # Python 3.10 - 3.13
 pip install -r requirements.txt
 cp .env.example .env
 python -m filewhisper.server_launcher   # opens http://localhost:8001
 ```
 
-OCR for images and scanned PDFs is built in (ONNX — no system Tesseract required).
+Python 3.10–3.13 is required (3.14+ isn't supported by the AI libraries yet). OCR for images and scanned PDFs is built in (ONNX — no system Tesseract required).
+
+The server listens on `127.0.0.1` only. To reach it from your phone or another device on the same Wi-Fi, start it with `FILEWHISPER_LAN=1` — be aware this lets anyone on that network browse and query your indexed documents.
 
 ## Project structure
 
@@ -120,8 +122,9 @@ $env:DO_NOT_TRACK=1; irm https://raw.githubusercontent.com/ishankanodia/FileWhis
 
 ## Security notes
 
+- The local app binds to `127.0.0.1` only by default; LAN access is opt-in via `FILEWHISPER_LAN=1`.
 - Don't commit `.env` or `rag_data/` (it can contain private document text and local file paths).
-- A hosted web app cannot browse a user's local folders — for hosted mode, use file uploads instead and never expose `/browse` publicly.
+- A hosted web app cannot browse a user's local folders — hosted deployments must set `FILEWHISPER_DISABLE_BROWSE=1` (the provided `Dockerfile` and `Procfile` already do), which disables the `/browse` and `/ingest` endpoints.
 - Revoke any API key that was ever committed to git history.
 
 ---
