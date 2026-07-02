@@ -54,7 +54,8 @@
     .sub{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:54ch;margin:20px auto 0;line-height:1.6}
 
     /* install card */
-    .install{margin:36px auto 0;max-width:680px}
+    .install-wrap{text-align:center}
+    .install{margin:56px auto 0;max-width:680px}
     .tabs{display:inline-flex;gap:3px;padding:4px;background:#eceae3;border:1px solid var(--line);border-radius:11px;margin-bottom:14px}
     .tab{border:none;background:transparent;font-family:inherit;font-size:13.5px;font-weight:500;color:var(--muted);padding:8px 18px;border-radius:8px;cursor:pointer;transition:.15s}
     .tab:hover{color:var(--ink)}
@@ -71,7 +72,7 @@
     .free-note .pill{display:inline-block;color:var(--accent);font-weight:600}
 
     /* app mock */
-    .mock-wrap{margin:64px auto 0;max-width:980px}
+    .mock-wrap{margin:48px auto 0;max-width:980px}
     .window{background:var(--app);border-radius:16px;overflow:hidden;box-shadow:0 50px 90px -40px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04);text-align:left}
     .titlebar{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
     .tl{width:11px;height:11px;border-radius:50%}
@@ -158,21 +159,6 @@
     <span class="eyebrow"><span class="dot"></span> Runs 100% on your own machine</span>
     <h1>Talk to your files. <em>Keep them yours.</em></h1>
     <p class="sub">FileWhisper reads your PDFs, notes and scanned documents and answers questions about them — entirely on your computer. No uploads, no account, and no API key to get started.</p>
-
-    <div class="install" id="install">
-      <div class="tabs" id="tabs">
-        <button class="tab" data-os="mac">macOS</button>
-        <button class="tab" data-os="windows">Windows</button>
-        <button class="tab" data-os="linux">Linux</button>
-      </div>
-      <div class="cmd">
-        <span class="pr mono" id="pr">$</span>
-        <code class="mono" id="cmd"></code>
-        <button class="copy" id="copy">Copy</button>
-      </div>
-      <p class="open-hint" id="openHint"></p>
-      <p class="free-note"><span class="pill">Free, no API key needed.</span> Works offline · macOS, Windows &amp; Linux · open source.</p>
-    </div>
   </header>
 
   <div class="wrap mock-wrap">
@@ -200,6 +186,23 @@
       </div>
     </div>
     <p class="caption">The actual app — a clean local web page that opens in your browser. Answers read like a conversation and cite the files they came from.</p>
+  </div>
+
+  <div class="wrap install-wrap">
+    <div class="install" id="install">
+      <div class="tabs" id="tabs">
+        <button class="tab" data-os="mac">macOS</button>
+        <button class="tab" data-os="windows">Windows</button>
+        <button class="tab" data-os="linux">Linux</button>
+      </div>
+      <div class="cmd">
+        <span class="pr mono" id="pr">$</span>
+        <code class="mono" id="cmd"></code>
+        <button class="copy" id="copy">Copy</button>
+      </div>
+      <p class="open-hint" id="openHint"></p>
+      <p class="free-note"><span class="pill">Free, no API key needed.</span> Works offline · macOS, Windows &amp; Linux · open source.</p>
+    </div>
   </div>
 
   <section id="how" class="wrap">
