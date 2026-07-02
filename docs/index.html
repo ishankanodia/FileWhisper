@@ -24,7 +24,10 @@
       line-height:1.5;-webkit-font-smoothing:antialiased;
     }
     a{color:inherit;text-decoration:none}
-    .wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+    /* horizontal-only longhands: the shorthand `padding:0 24px` used to zero
+       out the vertical padding of every <section class="wrap"> (class beats
+       element selector), so sections rendered with no breathing room at all */
+    .wrap{max-width:1060px;margin:0 auto;padding-left:24px;padding-right:24px}
     .mono{font-family:'Geist Mono',ui-monospace,monospace}
 
     /* nav */
@@ -51,7 +54,7 @@
     .sub{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:54ch;margin:20px auto 0;line-height:1.6}
 
     /* install card */
-    .install{margin:30px auto 0;max-width:680px}
+    .install{margin:36px auto 0;max-width:680px}
     .tabs{display:inline-flex;gap:3px;padding:4px;background:#eceae3;border:1px solid var(--line);border-radius:11px;margin-bottom:14px}
     .tab{border:none;background:transparent;font-family:inherit;font-size:13.5px;font-weight:500;color:var(--muted);padding:8px 18px;border-radius:8px;cursor:pointer;transition:.15s}
     .tab:hover{color:var(--ink)}
@@ -68,7 +71,7 @@
     .free-note .pill{display:inline-block;color:var(--accent);font-weight:600}
 
     /* app mock */
-    .mock-wrap{margin:54px auto 0;max-width:980px}
+    .mock-wrap{margin:64px auto 0;max-width:980px}
     .window{background:var(--app);border-radius:16px;overflow:hidden;box-shadow:0 50px 90px -40px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04);text-align:left}
     .titlebar{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
     .tl{width:11px;height:11px;border-radius:50%}
@@ -87,22 +90,22 @@
     .chip{font-family:'Geist Mono',monospace;font-size:10.5px;color:#7fd3a3;background:rgba(31,157,87,.08);border:1px solid rgba(31,157,87,.22);border-radius:6px;padding:3px 8px}
     .caption{text-align:center;color:var(--muted);font-size:13px;margin-top:16px}
 
-    /* sections */
-    section{padding:64px 0}
-    .sec-head{text-align:center;max-width:60ch;margin:0 auto 40px}
+    /* sections — one consistent vertical rhythm everywhere */
+    section{padding:72px 0}
+    .sec-head{text-align:center;max-width:60ch;margin:0 auto 44px}
     .sec-head .k{font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
     .sec-head h2{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(28px,4vw,40px);letter-spacing:-.01em;margin-top:12px}
     .sec-head p{color:var(--muted);margin-top:12px;font-size:16px}
 
-    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-    .step{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .step{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
     .step .n{font-family:'Fraunces',serif;font-size:30px;color:var(--accent);line-height:1}
     .step h3{font-size:16px;margin:12px 0 6px;font-weight:600}
     .step p{color:var(--muted);font-size:14px;line-height:1.6}
     .step .term{margin-top:10px;font-family:'Geist Mono',monospace;font-size:12px;color:var(--ink);background:#eceae3;border:1px solid var(--line);border-radius:7px;padding:6px 9px;display:inline-block}
 
     /* key band */
-    .keys{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:880px;margin:0 auto}
+    .keys{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:880px;margin:0 auto}
     .kcard{border-radius:var(--radius);padding:26px;border:1px solid var(--line)}
     .kcard.free{background:var(--panel)}
     .kcard.paid{background:var(--ink);color:#fff}
@@ -114,18 +117,21 @@
     .kcard li{font-size:14px;display:flex;align-items:flex-start;gap:9px}
     .kcard li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:7px;flex-shrink:0}
 
-    .feats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-    .feat{padding:22px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
-    .feat h4{font-size:15px;font-weight:600;margin-bottom:6px}
-    .feat p{font-size:13.5px;color:var(--muted);line-height:1.55}
+    .feats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+    .feat{padding:26px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+    .feat h4{font-size:15px;font-weight:600;margin-bottom:8px}
+    .feat p{font-size:13.5px;color:var(--muted);line-height:1.6}
 
-    footer{border-top:1px solid var(--line);padding:34px 0;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 
     @media(max-width:760px){
       .app-grid{grid-template-columns:1fr}.side{display:none}
       .steps,.keys,.feats{grid-template-columns:1fr}
       .nav-link.hide{display:none}
       .hero{padding:50px 0 20px}
+      section{padding:52px 0}
+      .sec-head{margin-bottom:32px}
+      .mock-wrap{margin-top:40px}
     }
   </style>
 </head>
@@ -245,6 +251,10 @@
   </section>
 
   <section class="wrap">
+    <div class="sec-head">
+      <div class="k">Why FileWhisper</div>
+      <h2>Private by design, simple by default.</h2>
+    </div>
     <div class="feats">
       <div class="feat"><h4>100% local</h4><p>Indexing, search and OCR all happen on your machine. Files never leave your computer.</p></div>
       <div class="feat"><h4>No setup headaches</h4><p>One command. No Docker, no databases, no Python wrangling. Small install, no PyTorch.</p></div>
