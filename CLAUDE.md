@@ -18,6 +18,7 @@ python -m filewhisper.server_launcher   # picks a free port 8001-8100, opens bro
 - There is **no build step and no test suite** — it's a small FastAPI app served as static HTML + JSON endpoints. Verify changes by running the launcher and exercising the UI / curling endpoints.
 - Run the ASGI app directly (no auto-browser, fixed port) with `uvicorn filewhisper.main:app --reload --port 8001` — useful for backend iteration. The `server_launcher` adds port-finding, browser-open, PID/port state files, and the single-instance check on top of this.
 - Hosted/container mode uses `Procfile` / `Dockerfile` (`uvicorn filewhisper.main:app`). In hosted mode never expose `/browse` (it lists the host's local filesystem) — use uploads instead.
+- Dev state collides with an installed copy: everything persists under `~/.filewhisper/` (index, `config.json`, pid/port files). When iterating locally on a machine that also runs the installed app, point `RAG_DATA_DIR`, `FILEWHISPER_CONFIG`, and `FILEWHISPER_HOME` at scratch paths so you don't pollute the real index/config. `FILEWHISPER_PORT` pins the launcher's port.
 
 ## Architecture (the three modules)
 
@@ -33,6 +34,8 @@ UI is a single static file: `filewhisper/static/index.html` (file browser + chat
 
 ## Conventions & gotchas
 
+- `.env` only seeds the initial LLM config. A `config.json` saved from the UI overrides it at startup (`_load_saved_llm_config` runs at import time and wins for provider/model/base_url). If an env change seems ignored, delete the saved config or point `FILEWHISPER_CONFIG` elsewhere.
+- `POST /ask` never returns an HTTP error — every exception is caught and returned as a 200 with `answer: "Error: ..."`. When testing, check the answer text, not the status code.
 - **LLM replies must read as plain chatbot prose** — never markdown or lists. This is enforced both in the prompts (`answer_node`) and defensively in `clean_text`. Preserve both layers when touching answer formatting.
 - When adding an LLM provider: add an entry to `PROVIDER_DEFAULTS`, add its key env var to the `llm_config["api_keys"]` dict, and (if a new `api_style`) a `_call_*` function wired into `call_llm`.
 - Supported file extensions are duplicated as a `SUPPORTED` set in both `rag.py` (`ingest_path`) and `main.py` (`/browse`) — keep them in sync.
