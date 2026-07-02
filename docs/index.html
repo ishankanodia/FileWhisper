@@ -122,11 +122,19 @@
     .feat h4{font-size:15px;font-weight:600;margin-bottom:8px}
     .feat p{font-size:13.5px;color:var(--muted);line-height:1.6}
 
-    footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    /* team */
+    .team{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:760px;margin:0 auto}
+    .member{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px;text-align:center}
+    .member .role{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+    .member .name{font-size:17px;font-weight:600}
+    .thanks{text-align:center;color:var(--muted);font-size:14px;margin-top:28px}
+    .thanks strong{color:var(--ink);font-weight:600}
+
+    footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:14px;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px}
 
     @media(max-width:760px){
       .app-grid{grid-template-columns:1fr}.side{display:none}
-      .steps,.keys,.feats{grid-template-columns:1fr}
+      .steps,.keys,.feats,.team{grid-template-columns:1fr}
       .nav-link.hide{display:none}
       .hero{padding:50px 0 20px}
       section{padding:52px 0}
@@ -141,7 +149,6 @@
       <a class="brand" href="#"><span class="mark"><img src="logo.png" alt=""></span>FileWhisper</a>
       <div class="nav-right">
         <a class="nav-link hide" href="#how">How it works</a>
-        <a class="nav-link" href="https://github.com/ishankanodia/FileWhisper" target="_blank" rel="noopener">GitHub</a>
         <a class="btn btn-dark" href="#install">Install</a>
       </div>
     </nav>
@@ -263,10 +270,31 @@
     </div>
   </section>
 
+  <section class="wrap" id="team">
+    <div class="sec-head">
+      <div class="k">Team</div>
+      <h2>The people behind FileWhisper</h2>
+    </div>
+    <div class="team">
+      <div class="member">
+        <div class="role">Co-founder</div>
+        <div class="name">Ishan Kanodia</div>
+      </div>
+      <div class="member">
+        <div class="role">Co-founder</div>
+        <div class="name">Dev Bawari</div>
+      </div>
+      <div class="member">
+        <div class="role">Mentor</div>
+        <div class="name">Prof. Amardip Ghosh</div>
+      </div>
+    </div>
+    <p class="thanks">Special thanks to <strong>Prof. Chetan Mistry</strong> for suggesting the use-case.</p>
+  </section>
+
   <div class="wrap">
     <footer>
-      <span>FileWhisper — local document chat. Built by Ishan Kanodia.</span>
-      <a class="nav-link" href="https://github.com/ishankanodia/FileWhisper" target="_blank" rel="noopener">View on GitHub ↗</a>
+      <span>FileWhisper — local document chat. Built by Ishan Kanodia and Dev Bawari.</span>
     </footer>
   </div>
 
