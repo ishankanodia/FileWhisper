@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FileWhisper for Websites — Local Document Chat Widget</title>
+  <meta name="description" content="Bring private, local AI search and document chat to your website visitors. Register your website and contact email to join the FileWhisper for Websites waitlist.">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f7f6f2; --panel:#ffffff; --ink:#17171b; --muted:#6c6c74;
+      --line:rgba(20,20,25,.10); --line-2:rgba(20,20,25,.16);
+      --accent:#1f9d57; --accent-light:rgba(31,157,87,.12);
+      --app:#0b0d13;
+      --radius:14px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      background:var(--bg);color:var(--ink);
+      font-family:'Geist',system-ui,sans-serif;
+      line-height:1.5;-webkit-font-smoothing:antialiased;
+      display:flex;flex-direction:column;min-height:100vh;
+    }
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:1060px;margin:0 auto;padding-left:24px;padding-right:24px;width:100%}
+    .mono{font-family:'Geist Mono',ui-monospace,monospace}
+
+    /* nav */
+    nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0;position:sticky;top:0;background:rgba(247,246,242,.82);backdrop-filter:blur(10px);z-index:50;border-bottom:1px solid transparent}
+    .brand{display:flex;align-items:center;gap:11px;font-weight:600;font-size:18px;letter-spacing:-.2px}
+    .brand .mark{width:30px;height:30px;border-radius:8px;background:var(--app);display:grid;place-items:center;overflow:hidden}
+    .brand .mark img{width:100%;height:100%}
+    .btn{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:500;padding:9px 16px;border-radius:10px;border:1px solid transparent;cursor:pointer;transition:.15s}
+    .btn-dark{background:var(--ink);color:#fff}
+    .btn-dark:hover{transform:translateY(-1px);background:#2c2c34}
+    .btn-ghost{border-color:var(--line-2);color:var(--ink)}
+    .btn-ghost:hover{background:#fff}
+
+    /* hero */
+    .hero{padding:60px 0 24px;text-align:center}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);background:#fff;padding:7px 14px;border-radius:100px}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(31,157,87,.14)}
+    h1{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:clamp(36px,5.5vw,56px);line-height:1.06;letter-spacing:-.01em;margin:22px auto 0;max-width:18ch}
+    h1 em{font-style:italic;color:var(--accent)}
+    .sub{font-size:clamp(15px,1.8vw,18px);color:var(--muted);max-width:54ch;margin:18px auto 0;line-height:1.6}
+
+    /* form layout */
+    .form-section{padding:30px 0 70px;flex:1}
+    .form-card{max-width:540px;margin:0 auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:38px 36px;box-shadow:0 24px 60px -28px rgba(0,0,0,.09)}
+    .form-card-head{margin-bottom:28px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+    .form-card-head h2{font-size:20px;font-weight:600;color:var(--ink);margin-bottom:6px}
+    .form-card-head p{font-size:14px;color:var(--muted);line-height:1.55}
+
+    .interest-form{display:flex;flex-direction:column;gap:22px}
+    .field-group{display:flex;flex-direction:column;gap:8px}
+    .field-group label{font-size:14px;font-weight:600;color:var(--ink);display:flex;align-items:center;justify-content:space-between}
+    .field-group input{
+      width:100%;font-family:inherit;font-size:15px;padding:13px 16px;
+      border:1px solid var(--line-2);border-radius:11px;background:#fff;color:var(--ink);
+      transition:all .18s ease;outline:none;
+    }
+    .field-group input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(31,157,87,.14)}
+    .field-group input::placeholder{color:#a4a4b0}
+    .field-hint{font-size:12.5px;color:var(--muted);line-height:1.45}
+
+    .submit-btn{
+      margin-top:8px;padding:14px 24px;font-size:15px;font-weight:600;
+      border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;
+      width:100%;box-shadow:0 8px 20px -6px rgba(23,23,27,.35);
+    }
+
+    .form-features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:540px;margin:28px auto 0}
+    .ff-item{background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-align:center}
+    .ff-item strong{display:block;font-size:13.5px;color:var(--ink);font-weight:600;margin-bottom:3px}
+    .ff-item span{font-size:12px;color:var(--muted)}
+
+    /* footer */
+    footer{border-top:1px solid var(--line);padding:36px 0;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-top:auto}
+    .footer-link{color:var(--ink);font-weight:500;transition:.15s ease}
+    .footer-link:hover{color:var(--accent)}
+
+    @media(max-width:640px){
+      .form-card{padding:28px 22px}
+      .form-features{grid-template-columns:1fr}
+      .hero{padding:44px 0 18px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav>
+      <a class="brand" href="index.html">
+        <span class="mark"><img src="logo.png" alt=""></span>FileWhisper
+      </a>
+      <a class="btn btn-ghost" href="index.html">&larr; Back to Home</a>
+    </nav>
+  </div>
+
+  <header class="wrap hero">
+    <span class="eyebrow"><span class="dot"></span> FileWhisper for Websites</span>
+    <h1>Bring local file intelligence to <em>your website</em>.</h1>
+    <p class="sub">Allow visitors to chat with your site's documentation and files privately on their own machines. Register your interest below.</p>
+  </header>
+
+  <main class="wrap form-section">
+    <div class="form-card">
+      <div class="form-card-head">
+        <h2>Join the Waitlist</h2>
+        <p>Tell us about your website and where we can reach you when integration is ready.</p>
+      </div>
+
+      <form action="https://formspree.io/f/YOUR_UNIQUE_ID" method="POST" class="interest-form">
+        <div class="field-group">
+          <label for="website_url">Website URL:</label>
+          <input type="url" id="website_url" name="website_url" placeholder="https://yourwebsite.com" required>
+          <span class="field-hint">Enter the domain or documentation URL where you plan to integrate FileWhisper.</span>
+        </div>
+
+        <div class="field-group">
+          <label for="email">Contact Email:</label>
+          <input type="email" id="email" name="email" placeholder="you@company.com" required>
+          <span class="field-hint">We'll notify you with integration details and early beta instructions.</span>
+        </div>
+
+        <button type="submit" class="btn btn-dark submit-btn">
+          <span>Submit</span>
+          <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor">
+            <path d="M8.22 2.97a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06l2.97-2.97H3.75a.75.75 0 0 1 0-1.5h7.44L8.22 4.03a.75.75 0 0 1 0-1.06Z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <div class="form-features">
+      <div class="ff-item">
+        <strong>100% Client-Side</strong>
+        <span>Zero server hosting cost</span>
+      </div>
+      <div class="ff-item">
+        <strong>Private AI Search</strong>
+        <span>Visitors keep their data local</span>
+      </div>
+      <div class="ff-item">
+        <strong>Simple Widget</strong>
+        <span>Drop-in JavaScript snippet</span>
+      </div>
+    </div>
+  </main>
+
+  <div class="wrap">
+    <footer>
+      <span>FileWhisper — local document chat. Built by Ishan Kanodia and Dev Bawari.</span>
+      <a href="index.html" class="footer-link">Back to Home</a>
+    </footer>
+  </div>
+</body>
+</html>
