@@ -124,11 +124,20 @@
     .feat p{font-size:13.5px;color:var(--muted);line-height:1.6}
 
     /* team */
-    .team{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:760px;margin:0 auto}
-    .member{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px;text-align:center}
-    .member .role{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
-    .member .name{font-size:17px;font-weight:600}
-    .thanks{text-align:center;color:var(--muted);font-size:14px;margin-top:28px}
+    .team{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:880px;margin:0 auto}
+    .member{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:30px 22px 26px;text-align:center;display:flex;flex-direction:column;align-items:center;transition:all .22s cubic-bezier(.16,1,.3,1)}
+    .member:hover{transform:translateY(-4px);border-color:rgba(31,157,87,.35);box-shadow:0 16px 36px -14px rgba(0,0,0,.08)}
+    .member-avatar{width:96px;height:96px;border-radius:50%;margin:0 auto 16px;overflow:hidden;border:2px solid var(--line-2);box-shadow:0 8px 24px -6px rgba(0,0,0,.12);background:#eae8e1;position:relative;display:flex;align-items:center;justify-content:center;transition:.22s ease}
+    .avatar-initials{font-family:'Fraunces',serif;font-size:28px;font-weight:600;color:var(--accent);user-select:none}
+    .member:hover .member-avatar{border-color:var(--accent);box-shadow:0 10px 28px -6px rgba(31,157,87,.25)}
+    .member-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
+    .member:hover .member-avatar img{transform:scale(1.05)}
+    .member .role{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+    .member .name{font-size:17.5px;font-weight:600;color:var(--ink)}
+    .member-social{margin-top:16px;display:flex;justify-content:center}
+    .social-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;padding:7px 15px;border-radius:100px;background:#f0f4fa;color:#0A66C2;border:1px solid rgba(10,102,194,.2);transition:.18s ease}
+    .social-link:hover{background:#0A66C2;color:#ffffff;border-color:#0A66C2;transform:translateY(-1.5px);box-shadow:0 6px 14px -3px rgba(10,102,194,.35)}
+    .thanks{text-align:center;color:var(--muted);font-size:14px;margin-top:32px}
     .thanks strong{color:var(--ink);font-weight:600}
 
     footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:14px;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px}
@@ -280,22 +289,58 @@
     </div>
     <div class="team">
       <div class="member">
+        <div class="member-avatar">
+          <span class="avatar-initials">IK</span>
+          <img src="ishan.jpg" onerror="this.onerror=null;this.src='ishan.png';this.onerror=function(){this.style.display='none'};" alt="Ishan Kanodia">
+        </div>
         <div class="role">Co-founder</div>
         <div class="name">Ishan Kanodia</div>
+        <div class="member-social">
+          <a href="https://www.linkedin.com/in/ishan-kanodia" target="_blank" rel="noopener noreferrer" class="social-link linkedin" aria-label="Ishan Kanodia LinkedIn Profile">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5V13.2a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2v-8.37H6.46M7.83 6.5A1.63 1.63 0 0 0 6.2 8.13a1.63 1.63 0 0 0 1.63 1.63 1.63 1.63 0 0 0 1.63-1.63A1.63 1.63 0 0 0 7.83 6.5Z"/>
+            </svg>
+            <span>LinkedIn</span>
+          </a>
+        </div>
       </div>
       <div class="member">
+        <div class="member-avatar">
+          <span class="avatar-initials">DB</span>
+          <img src="dev.jpg" onerror="this.onerror=null;this.src='dev.png';this.onerror=function(){this.style.display='none'};" alt="Dev Bawari">
+        </div>
         <div class="role">Co-founder</div>
         <div class="name">Dev Bawari</div>
+        <div class="member-social">
+          <a href="https://www.linkedin.com/in/dev-bawari-4a4341250" target="_blank" rel="noopener noreferrer" class="social-link linkedin" aria-label="Dev Bawari LinkedIn Profile">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5V13.2a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2v-8.37H6.46M7.83 6.5A1.63 1.63 0 0 0 6.2 8.13a1.63 1.63 0 0 0 1.63 1.63 1.63 1.63 0 0 0 1.63-1.63A1.63 1.63 0 0 0 7.83 6.5Z"/>
+            </svg>
+            <span>LinkedIn</span>
+          </a>
+        </div>
       </div>
       <div class="member">
+        <div class="member-avatar">
+          <span class="avatar-initials">AG</span>
+          <img src="amardip.jpg" onerror="this.onerror=null;this.src='amardip.png';this.onerror=function(){this.style.display='none'};" alt="Prof. Amardip Ghosh">
+        </div>
         <div class="role">Mentor</div>
         <div class="name">Prof. Amardip Ghosh</div>
+        <div class="member-social">
+          <a href="https://www.linkedin.com/in/amardip-ghosh-20865224/" target="_blank" rel="noopener noreferrer" class="social-link linkedin" aria-label="Prof. Amardip Ghosh LinkedIn Profile">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5V13.2a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2v-8.37H6.46M7.83 6.5A1.63 1.63 0 0 0 6.2 8.13a1.63 1.63 0 0 0 1.63 1.63 1.63 1.63 0 0 0 1.63-1.63A1.63 1.63 0 0 0 7.83 6.5Z"/>
+            </svg>
+            <span>LinkedIn</span>
+          </a>
+        </div>
       </div>
     </div>
-    <p class="thanks">Special thanks to <strong>Prof. Chetan Mistry</strong> for suggesting the use-case.</p>
+    <p class="thanks">Special thanks to <strong>Prof. Chetan Mistry</strong> for suggesting the PC use-case.</p>
   </section>
 
-  <div class="wrap">
+  <div class="wrap"> 
     <footer>
       <span>FileWhisper — local document chat. Built by Ishan Kanodia and Dev Bawari.</span>
     </footer>
