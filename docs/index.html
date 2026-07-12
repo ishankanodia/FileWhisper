@@ -130,14 +130,6 @@
     .yes{color:var(--accent);font-weight:600}
     .no{color:#b3543f}
 
-    /* testimonials */
-    .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-    .quote{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column}
-    .quote .qm{font-family:'Fraunces',serif;font-size:34px;line-height:1;color:var(--accent)}
-    .quote p{font-size:14.5px;line-height:1.65;margin-top:10px;flex:1}
-    .quote .who{margin-top:16px;font-size:13px;color:var(--muted)}
-    .quote .who b{color:var(--ink);font-weight:600;display:block;font-size:13.5px}
-
     /* key band */
     .keys{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:880px;margin:0 auto}
     .kcard{border-radius:var(--radius);padding:26px;border:1px solid var(--line)}
@@ -216,7 +208,7 @@
 
     @media(max-width:760px){
       .app-grid{grid-template-columns:1fr}.side{display:none}
-      .steps,.steps.four,.keys,.feats,.team,.quotes,.plans{grid-template-columns:1fr}
+      .steps,.steps.four,.keys,.feats,.team,.plans{grid-template-columns:1fr}
       .nav-link.hide{display:none}
       .hero{padding:38px 0 20px}
       section{padding:52px 0}
@@ -438,32 +430,6 @@
         <div class="feat"><h4>No setup headaches</h4><p>One command. No Docker, no databases, no Python wrangling. Small install, no PyTorch.</p></div>
         <div class="feat"><h4>Reads almost anything</h4><p>PDFs, text and Markdown, plus scanned pages and images via built-in OCR.</p></div>
         <div class="feat"><h4>Always cites sources</h4><p>Every answer shows exactly which of your files it came from, so you can trust it.</p></div>
-      </div>
-    </section>
-
-    <section class="wrap" id="testimonials">
-      <div class="sec-head">
-        <div class="k">Early users</div>
-        <h2>What people say after trying it.</h2>
-      </div>
-      <!-- PLACEHOLDER testimonials: replace each quote and attribution with a
-           real one (with permission) before promoting the site widely. -->
-      <div class="quotes">
-        <div class="quote">
-          <span class="qm">“</span>
-          <p>I pointed it at a folder of scanned lab reports and it just answered, with the exact file named under every reply. Nothing gets uploaded, which is the only reason I can use it for work documents at all.</p>
-          <div class="who"><b>Research scholar</b>Aerospace Engineering</div>
-        </div>
-        <div class="quote">
-          <span class="qm">“</span>
-          <p>The one-line install is real. I set it up for my father and he now asks it about his rent agreements and insurance PDFs by double-clicking an icon. He has never opened a terminal in his life.</p>
-          <div class="who"><b>Early user</b>Kolkata</div>
-        </div>
-        <div class="quote">
-          <span class="qm">“</span>
-          <p>Students can run it on ordinary college laptops. No GPU, no account, no API key, and it still reads scanned question papers through OCR. That combination is genuinely hard to find.</p>
-          <div class="who"><b>Faculty member</b>IIT Kharagpur</div>
-        </div>
       </div>
     </section>
 
