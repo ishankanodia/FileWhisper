@@ -4,7 +4,7 @@
 
 ### Chat with your files. 100% local. One-line install.
 
-FileWhisper indexes documents on your computer and answers questions about them with an LLM — **your files never leave your machine.** No cloud upload, no account, and it works out of the box with **no API key**.
+FileWhisper indexes documents on your computer and answers questions about them with an LLM. **Your files never leave your machine.** No cloud upload, no account, and it works out of the box with **no API key**.
 
 <!--
   TIP: a short GIF beats any screenshot here. Record one (open app → drop a PDF →
@@ -20,11 +20,11 @@ FileWhisper indexes documents on your computer and answers questions about them 
 
 ## Why FileWhisper?
 
-- **Truly private** — parsing, OCR, embeddings, and vector search all run locally. Only your question and the matched snippets are sent to the LLM, and even that can be a free keyless model.
-- **One-line install, no setup** — no Git, Node, Rust, or manual Python. Paste one command, get a double-click app on your Desktop.
-- **Works with zero API keys** — ships with a free built-in assistant. Add a Groq/OpenAI/Claude/Gemini key only if you want faster or sharper answers.
-- **Lightweight** — a slim ONNX stack (no PyTorch); the whole install incl. OCR is ~435 MB.
-- **Handles real documents** — `.txt`, `.md`, `.pdf`, and images (`.png/.jpg/.webp/.bmp/.tiff`), with automatic OCR for scanned PDFs and pictures.
+- **Truly private**: parsing, OCR, embeddings, and vector search all run locally. Only your question and the matched snippets are sent to the LLM, and even that can be a free keyless model.
+- **One-line install, no setup**: no Git, Node, Rust, or manual Python. Paste one command, get a double-click app on your Desktop.
+- **Works with zero API keys**: ships with a free built-in assistant. Add a Groq/OpenAI/Claude/Gemini key only if you want faster or sharper answers.
+- **Lightweight**: a slim ONNX stack (no PyTorch); the whole install incl. OCR is ~435 MB.
+- **Handles real documents**: `.txt`, `.md`, `.pdf`, and images (`.png/.jpg/.webp/.bmp/.tiff`), with automatic OCR for scanned PDFs and pictures.
 
 ## Install
 
@@ -44,9 +44,9 @@ Open **PowerShell** and paste:
 irm https://raw.githubusercontent.com/ishankanodia/FileWhisper/main/install.ps1 | iex
 ```
 
-The installer downloads FileWhisper, builds a small isolated environment (~435 MB, no PyTorch), pre-loads the local AI models, and drops a single **FileWhisper** launcher on your Desktop. After that, just **double-click FileWhisper** — it opens in your browser with **no terminal/console window**. To stop it, click **Quit FileWhisper** inside the app.
+The installer downloads FileWhisper, builds a small isolated environment (~435 MB, no PyTorch), pre-loads the local AI models, and drops a single **FileWhisper** launcher on your Desktop. After that, just **double-click FileWhisper** and it opens in your browser with **no terminal/console window**. To stop it, click **Quit FileWhisper** inside the app.
 
-> The launcher is generated on your own machine, so macOS doesn't flag it as an "unidentified developer" — it just opens. (On Linux you may need to right-click the Desktop icon → **Allow Launching** the first time.)
+> The launcher is generated on your own machine, so macOS doesn't flag it as an "unidentified developer", it just opens. (On Linux you may need to right-click the Desktop icon → **Allow Launching** the first time.)
 
 **To update:** re-run the same one-line command. It rebuilds from the latest version; your indexed data is preserved.
 
@@ -89,9 +89,9 @@ cp .env.example .env
 python -m filewhisper.server_launcher   # opens http://localhost:8001
 ```
 
-Python 3.10–3.13 is required (3.14+ isn't supported by the AI libraries yet). OCR for images and scanned PDFs is built in (ONNX — no system Tesseract required).
+Python 3.10-3.13 is required (3.14+ isn't supported by the AI libraries yet). OCR for images and scanned PDFs is built in (ONNX, no system Tesseract required).
 
-The server listens on `127.0.0.1` only. To reach it from your phone or another device on the same Wi-Fi, start it with `FILEWHISPER_LAN=1` — be aware this lets anyone on that network browse and query your indexed documents.
+The server listens on `127.0.0.1` only. To reach it from your phone or another device on the same Wi-Fi, start it with `FILEWHISPER_LAN=1`, but be aware this lets anyone on that network browse and query your indexed documents.
 
 ## Project structure
 
@@ -106,9 +106,9 @@ docs/                           Website (GitHub Pages) + screenshot
 
 ## Privacy & analytics
 
-Your documents and questions never leave your machine except for the final LLM call (which you control — use the free local provider for zero external calls).
+Your documents and questions never leave your machine except for the final LLM call (which you control: use the free local provider for zero external calls).
 
-The **installer** sends a single anonymous ping on install (operating system + version only — no personal data, no file info, no identifiers) so we can gauge how many people use FileWhisper. To opt out, set either environment variable before installing:
+The **installer** sends a single anonymous ping on install (operating system + version only, no personal data, no file info, no identifiers) so we can gauge how many people use FileWhisper. To opt out, set either environment variable before installing:
 
 ```bash
 DO_NOT_TRACK=1 curl -fsSL https://raw.githubusercontent.com/ishankanodia/FileWhisper/main/install.sh | bash
@@ -124,11 +124,11 @@ $env:DO_NOT_TRACK=1; irm https://raw.githubusercontent.com/ishankanodia/FileWhis
 
 - The local app binds to `127.0.0.1` only by default; LAN access is opt-in via `FILEWHISPER_LAN=1`.
 - Don't commit `.env` or `rag_data/` (it can contain private document text and local file paths).
-- A hosted web app cannot browse a user's local folders — hosted deployments must set `FILEWHISPER_DISABLE_BROWSE=1` (the provided `Dockerfile` and `Procfile` already do), which disables the `/browse` and `/ingest` endpoints.
+- A hosted web app cannot browse a user's local folders, so hosted deployments must set `FILEWHISPER_DISABLE_BROWSE=1` (the provided `Dockerfile` and `Procfile` already do), which disables the `/browse` and `/ingest` endpoints.
 - Revoke any API key that was ever committed to git history.
 
 ---
 
 <div align="center">
-Made for people who want to ask their own files questions — without handing them to the cloud.
+Made for people who want to ask their own files questions, without handing them to the cloud.
 </div>
