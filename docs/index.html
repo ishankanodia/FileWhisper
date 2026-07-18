@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FileWhisper — chat with your files, privately</title>
-  <meta name="description" content="FileWhisper answers questions about your PDFs, notes and scans entirely on your own computer. No uploads, no account, no API key to start. One command to install on macOS, Windows or Linux.">
+  <title>FileWhisper: AI search for your files and your website</title>
+  <meta name="description" content="FileWhisper answers questions about your PDFs, notes and scans entirely on your own computer. And with one command, it adds an AI search box to your website that cites your own pages. No uploads, no account, no API key to start.">
   <link rel="icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,11 +45,19 @@
     .btn-ghost{border-color:var(--line-2);color:var(--ink)}
     .btn-ghost:hover{background:#fff}
 
+    /* product switch (Desktop | Web) */
+    .switch-bar{display:flex;justify-content:center;padding:28px 0 0}
+    .switch{display:inline-flex;gap:4px;padding:5px;background:#eceae3;border:1px solid var(--line);border-radius:13px}
+    .switch button{border:none;background:transparent;font-family:inherit;font-size:14.5px;font-weight:600;color:var(--muted);padding:10px 24px;border-radius:9px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:8px}
+    .switch button:hover{color:var(--ink)}
+    .switch button.active{background:var(--ink);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+    .view[hidden]{display:none}
+
     /* hero */
-    .hero{padding:74px 0 30px;text-align:center}
+    .hero{padding:52px 0 30px;text-align:center}
     .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);background:#fff;padding:7px 14px;border-radius:100px}
     .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(31,157,87,.14)}
-    h1{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:clamp(40px,6.4vw,68px);line-height:1.02;letter-spacing:-.01em;margin:24px auto 0;max-width:13ch}
+    h1{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:clamp(40px,6.4vw,68px);line-height:1.02;letter-spacing:-.01em;margin:24px auto 0;max-width:14ch}
     h1 em{font-style:italic;color:var(--accent)}
     .sub{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:54ch;margin:20px auto 0;line-height:1.6}
 
@@ -91,7 +99,7 @@
     .chip{font-family:'Geist Mono',monospace;font-size:10.5px;color:#7fd3a3;background:rgba(31,157,87,.08);border:1px solid rgba(31,157,87,.22);border-radius:6px;padding:3px 8px}
     .caption{text-align:center;color:var(--muted);font-size:13px;margin-top:16px}
 
-    /* sections — one consistent vertical rhythm everywhere */
+    /* sections, one consistent vertical rhythm everywhere */
     section{padding:72px 0}
     .sec-head{text-align:center;max-width:60ch;margin:0 auto 44px}
     .sec-head .k{font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
@@ -99,11 +107,28 @@
     .sec-head p{color:var(--muted);margin-top:12px;font-size:16px}
 
     .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .steps.four{grid-template-columns:repeat(4,1fr)}
     .step{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
     .step .n{font-family:'Fraunces',serif;font-size:30px;color:var(--accent);line-height:1}
     .step h3{font-size:16px;margin:12px 0 6px;font-weight:600}
     .step p{color:var(--muted);font-size:14px;line-height:1.6}
     .step .term{margin-top:10px;font-family:'Geist Mono',monospace;font-size:12px;color:var(--ink);background:#eceae3;border:1px solid var(--line);border-radius:7px;padding:6px 9px;display:inline-block}
+
+    /* demo video */
+    .demo-frame{max-width:880px;margin:0 auto;border-radius:16px;overflow:hidden;background:var(--app);box-shadow:0 40px 80px -36px rgba(0,0,0,.5),0 0 0 1px rgba(20,20,25,.08)}
+    .demo-frame video,.demo-frame img{display:block;width:100%;height:auto}
+
+    /* comparison table */
+    .cmp-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+    table.cmp{width:100%;border-collapse:collapse;min-width:660px}
+    .cmp th,.cmp td{padding:14px 18px;font-size:14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+    .cmp thead th{font-size:13px;font-weight:600;background:#fbfaf7}
+    .cmp tbody tr:last-child td,.cmp tbody tr:last-child th{border-bottom:none}
+    .cmp tbody th{font-weight:500;color:var(--muted);white-space:nowrap}
+    .cmp .fwcol{background:rgba(31,157,87,.06);font-weight:500}
+    .cmp thead .fwcol{color:var(--accent)}
+    .yes{color:var(--accent);font-weight:600}
+    .no{color:#b3543f}
 
     /* key band */
     .keys{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:880px;margin:0 auto}
@@ -123,6 +148,43 @@
     .feat h4{font-size:15px;font-weight:600;margin-bottom:8px}
     .feat p{font-size:13.5px;color:var(--muted);line-height:1.6}
 
+    /* web view: script snippet */
+    .snippet{max-width:680px;margin:0 auto}
+    .snippet .lbl{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:26px 0 10px;text-align:left}
+    .snippet .lbl:first-child{margin-top:0}
+
+    /* pricing */
+    .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch}
+    .plan{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:28px;display:flex;flex-direction:column;position:relative}
+    .plan.hot{background:var(--ink);color:#fff;border-color:var(--ink)}
+    .plan .tier{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+    .plan .price{font-family:'Fraunces',serif;font-weight:500;font-size:34px;margin:10px 0 2px}
+    .plan .per{font-size:13px;color:var(--muted)}
+    .plan.hot .per{color:#c9c9d2}
+    .plan .blurb{font-size:14px;color:var(--muted);margin-top:10px;line-height:1.55}
+    .plan.hot .blurb{color:#c9c9d2}
+    .plan ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:9px;flex:1}
+    .plan li{font-size:14px;display:flex;align-items:flex-start;gap:9px}
+    .plan li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:7px;flex-shrink:0}
+    .plan .badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:100px}
+    .plan .btn{margin-top:22px;justify-content:center}
+    .plan.hot .btn{background:#fff;color:var(--ink)}
+    .plans-note{text-align:center;color:var(--muted);font-size:13.5px;margin-top:22px}
+
+    /* waitlist form */
+    .form-card{max-width:540px;margin:0 auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:38px 36px;box-shadow:0 24px 60px -28px rgba(0,0,0,.09)}
+    .form-card-head{margin-bottom:28px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+    .form-card-head h3{font-size:20px;font-weight:600;margin-bottom:6px}
+    .form-card-head p{font-size:14px;color:var(--muted);line-height:1.55}
+    .interest-form{display:flex;flex-direction:column;gap:22px}
+    .field-group{display:flex;flex-direction:column;gap:8px}
+    .field-group label{font-size:14px;font-weight:600}
+    .field-group input{width:100%;font-family:inherit;font-size:15px;padding:13px 16px;border:1px solid var(--line-2);border-radius:11px;background:#fff;color:var(--ink);transition:all .18s ease;outline:none}
+    .field-group input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(31,157,87,.14)}
+    .field-group input::placeholder{color:#a4a4b0}
+    .field-hint{font-size:12.5px;color:var(--muted);line-height:1.45}
+    .submit-btn{margin-top:8px;padding:14px 24px;font-size:15px;font-weight:600;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-shadow:0 8px 20px -6px rgba(23,23,27,.35)}
+
     /* team */
     .team{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:880px;margin:0 auto}
     .member{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:30px 22px 26px;text-align:center;display:flex;flex-direction:column;align-items:center;transition:all .22s cubic-bezier(.16,1,.3,1)}
@@ -141,17 +203,19 @@
     .thanks strong{color:var(--ink);font-weight:600}
 
     footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-    .footer-link{color:var(--ink);font-weight:500;transition:.15s ease}
+    .footer-link{color:var(--ink);font-weight:500;transition:.15s ease;background:none;border:none;font-family:inherit;font-size:14px;cursor:pointer;padding:0}
     .footer-link:hover{color:var(--accent)}
 
     @media(max-width:760px){
       .app-grid{grid-template-columns:1fr}.side{display:none}
-      .steps,.keys,.feats,.team{grid-template-columns:1fr}
+      .steps,.steps.four,.keys,.feats,.team,.plans{grid-template-columns:1fr}
       .nav-link.hide{display:none}
-      .hero{padding:50px 0 20px}
+      .hero{padding:38px 0 20px}
       section{padding:52px 0}
       .sec-head{margin-bottom:32px}
       .mock-wrap{margin-top:40px}
+      .switch button{padding:9px 16px;font-size:13.5px}
+      .form-card{padding:28px 22px}
     }
   </style>
 </head>
@@ -160,130 +224,375 @@
     <nav id="nav">
       <a class="brand" href="#"><span class="mark"><img src="logo.png" alt=""></span>FileWhisper</a>
       <div class="nav-right">
-        <a class="nav-link hide" href="#how">How it works</a>
-        <a class="btn btn-dark" href="#install">Install</a>
+        <a class="nav-link hide" id="navSecondary" href="#how">How it works</a>
+        <a class="btn btn-dark" id="navCta" href="#install">Install</a>
       </div>
     </nav>
   </div>
 
-  <header class="wrap hero">
-    <span class="eyebrow"><span class="dot"></span> Runs 100% on your own machine</span>
-    <h1>Talk to your files. <em>Keep them yours.</em></h1>
-    <p class="sub">FileWhisper reads your PDFs, notes and scanned documents and answers questions about them — entirely on your computer. No uploads, no account, and no API key to get started.</p>
-  </header>
+  <!-- Desktop | Web product switch -->
+  <div class="wrap switch-bar">
+    <div class="switch" role="tablist" aria-label="Choose product">
+      <button id="swDesktop" class="active" onclick="setView('desktop')">Desktop App</button>
+      <button id="swWeb" onclick="setView('web')">For Websites</button>
+    </div>
+  </div>
 
-  <div class="wrap mock-wrap">
-    <div class="window">
-      <div class="titlebar">
-        <span class="tl r"></span><span class="tl y"></span><span class="tl g"></span>
-        <span class="t">FileWhisper — 127.0.0.1:8001</span>
-      </div>
-      <div class="app-grid">
-        <aside class="side">
-          <div class="h"><span class="mark" style="width:22px;height:22px;border-radius:6px;background:#13151c;display:inline-grid;place-items:center;overflow:hidden"><img src="logo.png" style="width:100%" alt=""></span> FileWhisper</div>
-          <p class="lbl">Indexed sources</p>
-          <div class="src">📄 Itinerary.pdf</div>
-          <div class="src">📄 Lease_Agreement.pdf</div>
-          <div class="src">🖼 Boarding_Pass.png</div>
-          <div class="src">📝 meeting-notes.md</div>
-        </aside>
-        <div class="chat">
-          <div class="q">What time is my Indore to Kolkata flight, and when does check-in close?</div>
-          <div class="a">
-            <p>Your IndiGo flight 6E798 from Indore to Kolkata departs at 8:30 PM on 2 July 2026 and arrives at 10:40 PM. Check-in closes 45 minutes before departure, so make sure you’re at the counter by 7:45 PM.</p>
-            <div class="srcrow"><span class="chip">Itinerary.pdf</span><span class="chip">Boarding_Pass.png</span></div>
+  <!-- ============================ DESKTOP VIEW ============================ -->
+  <div class="view" id="view-desktop">
+
+    <header class="wrap hero">
+      <span class="eyebrow"><span class="dot"></span> Runs 100% on your own machine</span>
+      <h1>Talk to your files. <em>Keep them yours.</em></h1>
+      <p class="sub">FileWhisper reads your PDFs, notes and scanned documents and answers questions about them, entirely on your computer. No uploads, no account, and no API key to get started.</p>
+    </header>
+
+    <div class="wrap mock-wrap">
+      <div class="window">
+        <div class="titlebar">
+          <span class="tl r"></span><span class="tl y"></span><span class="tl g"></span>
+          <span class="t">FileWhisper (127.0.0.1:8001)</span>
+        </div>
+        <div class="app-grid">
+          <aside class="side">
+            <div class="h"><span class="mark" style="width:22px;height:22px;border-radius:6px;background:#13151c;display:inline-grid;place-items:center;overflow:hidden"><img src="logo.png" style="width:100%" alt=""></span> FileWhisper</div>
+            <p class="lbl">Indexed sources</p>
+            <div class="src">📄 Itinerary.pdf</div>
+            <div class="src">📄 Lease_Agreement.pdf</div>
+            <div class="src">🖼 Boarding_Pass.png</div>
+            <div class="src">📝 meeting-notes.md</div>
+          </aside>
+          <div class="chat">
+            <div class="q">What time is my Indore to Kolkata flight, and when does check-in close?</div>
+            <div class="a">
+              <p>Your IndiGo flight 6E798 from Indore to Kolkata departs at 8:30 PM on 2 July 2026 and arrives at 10:40 PM. Check-in closes 45 minutes before departure, so make sure you’re at the counter by 7:45 PM.</p>
+              <div class="srcrow"><span class="chip">Itinerary.pdf</span><span class="chip">Boarding_Pass.png</span></div>
+            </div>
           </div>
         </div>
       </div>
+      <p class="caption">The actual app: a clean local web page that opens in your browser. Answers read like a conversation and cite the files they came from.</p>
     </div>
-    <p class="caption">The actual app — a clean local web page that opens in your browser. Answers read like a conversation and cite the files they came from.</p>
-  </div>
 
-  <div class="wrap install-wrap">
-    <div class="install" id="install">
-      <div class="tabs" id="tabs">
-        <button class="tab" data-os="mac">macOS</button>
-        <button class="tab" data-os="windows">Windows</button>
-        <button class="tab" data-os="linux">Linux</button>
+    <div class="wrap install-wrap">
+      <div class="install" id="install">
+        <div class="tabs" id="tabs">
+          <button class="tab" data-os="mac">macOS</button>
+          <button class="tab" data-os="windows">Windows</button>
+          <button class="tab" data-os="linux">Linux</button>
+        </div>
+        <div class="cmd">
+          <span class="pr mono" id="pr">$</span>
+          <code class="mono" id="cmd"></code>
+          <button class="copy" id="copy">Copy</button>
+        </div>
+        <p class="open-hint" id="openHint"></p>
+        <p class="free-note"><span class="pill">Free, no API key needed.</span> Private by design · macOS, Windows &amp; Linux · open source.</p>
       </div>
-      <div class="cmd">
-        <span class="pr mono" id="pr">$</span>
-        <code class="mono" id="cmd"></code>
-        <button class="copy" id="copy">Copy</button>
-      </div>
-      <p class="open-hint" id="openHint"></p>
-      <p class="free-note"><span class="pill">Free, no API key needed.</span> Works offline · macOS, Windows &amp; Linux · open source.</p>
     </div>
-  </div>
 
-  <section id="how" class="wrap">
-    <div class="sec-head">
-      <div class="k">Get going in a minute</div>
-      <h2>Three steps. Then never the terminal again.</h2>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <div class="n">1</div>
-        <h3>Open your terminal</h3>
-        <p id="step1">On a Mac, press Command + Space, type “Terminal”, and hit Enter.</p>
-        <span class="term mono" id="step1cmd">Terminal</span>
+    <section id="demo" class="wrap">
+      <div class="sec-head">
+        <div class="k">See it in action</div>
+        <h2>From folder to answers in one minute.</h2>
+        <p>Watch FileWhisper index a folder of PDFs and scans, then answer questions with citations.</p>
       </div>
-      <div class="step">
-        <div class="n">2</div>
-        <h3>Paste one line</h3>
-        <p>Paste the install command from above and press Enter. It sets everything up and adds a FileWhisper icon to your Desktop.</p>
+      <div class="demo-frame">
+        <!-- Drop a demo recording at docs/demo.mp4 and it will play here.
+             Until then the screenshot below is shown instead. -->
+        <video id="demoVideo" controls muted playsinline preload="metadata" poster="screenshot.png">
+          <source id="demoSource" src="demo.mp4" type="video/mp4">
+        </video>
+        <img id="demoFallback" src="screenshot.png" alt="FileWhisper answering a question about indexed documents" hidden>
       </div>
-      <div class="step">
-        <div class="n">3</div>
-        <h3>Open &amp; ask</h3>
-        <p>Double-click FileWhisper. It opens in your browser — pick a folder, then just type your question in plain English.</p>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="wrap">
-    <div class="sec-head">
-      <div class="k">Your choice of brain</div>
-      <h2>Free to start. Faster with your own key.</h2>
-      <p>FileWhisper works the moment you install it — no signup, no key. Want quicker, sharper answers? Add an API key from <strong>any</strong> major provider. It’s completely optional, and it’s saved on your computer and used directly.</p>
-    </div>
-    <div class="keys">
-      <div class="kcard free">
-        <div class="tag">No key</div>
-        <h3>Just install and ask</h3>
-        <p>A free built-in assistant answers your questions out of the box. Perfect for trying it out and everyday use.</p>
-        <ul>
-          <li>Zero setup, zero cost</li>
-          <li>Nothing to sign up for</li>
-          <li>Great for quick lookups</li>
-        </ul>
+    <section id="how" class="wrap">
+      <div class="sec-head">
+        <div class="k">Get going in a minute</div>
+        <h2>Three steps. Then never the terminal again.</h2>
       </div>
-      <div class="kcard paid">
-        <div class="tag">Your key — optional</div>
-        <h3>Faster &amp; more accurate</h3>
-        <p>Paste a key from any provider — Groq, OpenAI, Claude, Gemini, or any OpenAI-compatible API — in the LLM Settings panel for noticeably quicker, sharper answers. Totally optional.</p>
-        <ul>
-          <li>Use any LLM you like</li>
-          <li>Snappier, more accurate replies on long documents</li>
-          <li>Key stays local — never uploaded</li>
-        </ul>
+      <div class="steps">
+        <div class="step">
+          <div class="n">1</div>
+          <h3>Open your terminal</h3>
+          <p id="step1">On a Mac, press Command + Space, type “Terminal”, and hit Enter.</p>
+          <span class="term mono" id="step1cmd">Terminal</span>
+        </div>
+        <div class="step">
+          <div class="n">2</div>
+          <h3>Paste one line</h3>
+          <p>Paste the install command from above and press Enter. It sets everything up and adds a FileWhisper icon to your Desktop.</p>
+        </div>
+        <div class="step">
+          <div class="n">3</div>
+          <h3>Open &amp; ask</h3>
+          <p>Double-click FileWhisper. It opens in your browser. Pick a folder, then just type your question in plain English.</p>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="wrap">
-    <div class="sec-head">
-      <div class="k">Why FileWhisper</div>
-      <h2>Private by design, simple by default.</h2>
-    </div>
-    <div class="feats">
-      <div class="feat"><h4>100% local</h4><p>Indexing, search and OCR all happen on your machine. Files never leave your computer.</p></div>
-      <div class="feat"><h4>No setup headaches</h4><p>One command. No Docker, no databases, no Python wrangling. Small install, no PyTorch.</p></div>
-      <div class="feat"><h4>Reads almost anything</h4><p>PDFs, text and Markdown, plus scanned pages and images via built-in OCR.</p></div>
-      <div class="feat"><h4>Always cites sources</h4><p>Every answer shows exactly which of your files it came from, so you can trust it.</p></div>
-    </div>
-  </section>
+    <section class="wrap" id="compare">
+      <div class="sec-head">
+        <div class="k">How it compares</div>
+        <h2>Private where the others upload.</h2>
+        <p>Cloud tools make you upload your documents to someone else's server. FileWhisper keeps everything on your machine.</p>
+      </div>
+      <div class="cmp-scroll">
+        <table class="cmp">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="fwcol">FileWhisper</th>
+              <th>ChatGPT / ChatPDF uploads</th>
+              <th>NotebookLM</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Where your files go</th>
+              <td class="fwcol"><span class="yes">Stay on your computer</span></td>
+              <td><span class="no">Uploaded to the cloud</span></td>
+              <td><span class="no">Uploaded to Google</span></td>
+            </tr>
+            <tr>
+              <th>Account needed</th>
+              <td class="fwcol"><span class="yes">None</span></td>
+              <td>Yes</td>
+              <td>Google account</td>
+            </tr>
+            <tr>
+              <th>Cost</th>
+              <td class="fwcol"><span class="yes">Free &amp; open source</span></td>
+              <td>Free tier, then paid</td>
+              <td>Free, usage limits</td>
+            </tr>
+            <tr>
+              <th>Scanned pages &amp; photos (OCR)</th>
+              <td class="fwcol"><span class="yes">Built in</span></td>
+              <td>Varies by plan</td>
+              <td>Limited</td>
+            </tr>
+            <tr>
+              <th>Cites the exact source file</th>
+              <td class="fwcol"><span class="yes">Every answer</span></td>
+              <td>Sometimes</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <th>Choice of AI model</th>
+              <td class="fwcol"><span class="yes">Any provider, or the free built-in one</span></td>
+              <td>Fixed</td>
+              <td>Fixed (Gemini)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
+    <section class="wrap">
+      <div class="sec-head">
+        <div class="k">Your choice of brain</div>
+        <h2>Free to start. Faster with your own key.</h2>
+        <p>FileWhisper works the moment you install it. No signup, no key. Want quicker, sharper answers? Add an API key from <strong>any</strong> major provider. It’s completely optional, and it’s saved on your computer and used directly.</p>
+      </div>
+      <div class="keys">
+        <div class="kcard free">
+          <div class="tag">No key</div>
+          <h3>Just install and ask</h3>
+          <p>A free built-in assistant answers your questions out of the box. Perfect for trying it out and everyday use.</p>
+          <ul>
+            <li>Zero setup, zero cost</li>
+            <li>Nothing to sign up for</li>
+            <li>Great for quick lookups</li>
+          </ul>
+        </div>
+        <div class="kcard paid">
+          <div class="tag">Your key (optional)</div>
+          <h3>Faster &amp; more accurate</h3>
+          <p>Paste a key from any provider (Groq, OpenAI, Claude, Gemini, or any OpenAI-compatible API) in the LLM Settings panel for noticeably quicker, sharper answers. Totally optional.</p>
+          <ul>
+            <li>Use any LLM you like</li>
+            <li>Snappier, more accurate replies on long documents</li>
+            <li>Key stays local, never uploaded</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="sec-head">
+        <div class="k">Why FileWhisper</div>
+        <h2>Private by design, simple by default.</h2>
+      </div>
+      <div class="feats">
+        <div class="feat"><h4>100% local</h4><p>Indexing, search and OCR all happen on your machine. Files never leave your computer.</p></div>
+        <div class="feat"><h4>No setup headaches</h4><p>One command. No Docker, no databases, no Python wrangling. Small install, no PyTorch.</p></div>
+        <div class="feat"><h4>Reads almost anything</h4><p>PDFs, text and Markdown, plus scanned pages and images via built-in OCR.</p></div>
+        <div class="feat"><h4>Always cites sources</h4><p>Every answer shows exactly which of your files it came from, so you can trust it.</p></div>
+      </div>
+    </section>
+
+  </div><!-- /view-desktop -->
+
+  <!-- ============================== WEB VIEW ============================== -->
+  <div class="view" id="view-web" hidden>
+
+    <header class="wrap hero">
+      <span class="eyebrow"><span class="dot"></span> FileWhisper for Websites</span>
+      <h1>The AI <em>search engine</em> for your website.</h1>
+      <p class="sub">One command on your server. Five minutes later, your visitors get an “Ask our docs” search box that answers questions from your own pages, manuals and PDFs, and cites exactly where each answer came from.</p>
+    </header>
+
+    <section class="wrap" style="padding-top:36px">
+      <div class="sec-head">
+        <div class="k">How it works</div>
+        <h2>Install like a developer tool, not a platform.</h2>
+        <p>No vector databases to run, no pipelines to build, no AI team required. FileWhisper indexes your documentation on your own server and serves search from there.</p>
+      </div>
+      <div class="steps four">
+        <div class="step">
+          <div class="n">1</div>
+          <h3>Run one command</h3>
+          <p>SSH into your web server and paste the install command. That's the whole setup.</p>
+          <span class="term mono">curl … | bash</span>
+        </div>
+        <div class="step">
+          <div class="n">2</div>
+          <h3>Pick your content</h3>
+          <p>A setup page opens in your browser. Point and click through your server's folders to choose the docs, manuals and PDFs to include.</p>
+        </div>
+        <div class="step">
+          <div class="n">3</div>
+          <h3>It indexes everything</h3>
+          <p>FileWhisper reads your pages and scanned files and builds a search index, right on your server. Your content never leaves it.</p>
+        </div>
+        <div class="step">
+          <div class="n">4</div>
+          <h3>Paste one script tag</h3>
+          <p>Copy the snippet it gives you into your site's HTML. The AI search box appears instantly.</p>
+          <span class="term mono">&lt;script&gt;</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" style="padding-top:0">
+      <div class="snippet">
+        <p class="lbl">On your server</p>
+        <div class="cmd">
+          <span class="pr mono">$</span>
+          <code class="mono">curl -fsSL https://filewhisper.in/install.sh | bash</code>
+          <button class="copy" data-copy="curl -fsSL https://filewhisper.in/install.sh | bash">Copy</button>
+        </div>
+        <p class="lbl">Then, in your site's HTML</p>
+        <div class="cmd">
+          <span class="pr mono">&gt;</span>
+          <code class="mono">&lt;script src="https://yoursite.com/filewhisper.js"&gt;&lt;/script&gt;</code>
+          <button class="copy" data-copy='<script src="https://yoursite.com/filewhisper.js"></script>'>Copy</button>
+        </div>
+        <p class="free-note" style="text-align:center">That's it. Developers trust search boxes, and your visitors already know how to use one.</p>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="sec-head">
+        <div class="k">Who it's for</div>
+        <h2>Anywhere people dig through documents.</h2>
+      </div>
+      <div class="feats">
+        <div class="feat"><h4>Product &amp; API docs</h4><p>Let developers ask questions instead of hunting through pages. Every answer links back to the exact doc.</p></div>
+        <div class="feat"><h4>Universities &amp; research</h4><p>Course portals, lab knowledge bases and paper collections become searchable. Students get cited answers.</p></div>
+        <div class="feat"><h4>Company knowledge</h4><p>Policies, handbooks and internal manuals, searchable in plain language on your intranet.</p></div>
+        <div class="feat"><h4>Manuals &amp; standards</h4><p>Equipment manuals, standards libraries and government portals, including scanned PDFs via OCR.</p></div>
+      </div>
+    </section>
+
+    <section class="wrap" id="pricing">
+      <div class="sec-head">
+        <div class="k">Pricing</div>
+        <h2>The desktop app is free. Websites pay for scale.</h2>
+        <p>FileWhisper Desktop stays free and open source. FileWhisper for Websites is the commercial product for organizations.</p>
+      </div>
+      <div class="plans">
+        <div class="plan">
+          <div class="tier">Community</div>
+          <div class="price">Free</div>
+          <div class="per">forever</div>
+          <p class="blurb">For personal sites, small docs and trying it out.</p>
+          <ul>
+            <li>Up to 500 pages indexed</li>
+            <li>One website</li>
+            <li>Cited answers out of the box</li>
+            <li>Community support</li>
+          </ul>
+          <button class="btn btn-ghost" onclick="goWaitlist()">Join the waitlist</button>
+        </div>
+        <div class="plan hot">
+          <span class="badge">Most popular</span>
+          <div class="tier">Pro</div>
+          <div class="price">$49</div>
+          <div class="per">per month</div>
+          <p class="blurb">For teams whose documentation is part of the product.</p>
+          <ul>
+            <li>Unlimited pages</li>
+            <li>Search analytics</li>
+            <li>Authentication</li>
+            <li>API access</li>
+            <li>Priority support</li>
+          </ul>
+          <button class="btn" onclick="goWaitlist()">Join the waitlist</button>
+        </div>
+        <div class="plan">
+          <div class="tier">Enterprise</div>
+          <div class="price">Custom</div>
+          <div class="per">talk to us</div>
+          <p class="blurb">For organizations with compliance and scale needs.</p>
+          <ul>
+            <li>SSO</li>
+            <li>On-premise deployment</li>
+            <li>Kubernetes</li>
+            <li>Custom models</li>
+          </ul>
+          <button class="btn btn-ghost" onclick="goWaitlist()">Contact us</button>
+        </div>
+      </div>
+      <p class="plans-note">Pricing is indicative while we're in early access. Waitlist members lock in early-adopter terms.</p>
+    </section>
+
+    <section class="wrap" id="waitlist" style="padding-top:0">
+      <div class="sec-head">
+        <div class="k">Early access</div>
+        <h2>Get it on your website first.</h2>
+      </div>
+      <div class="form-card">
+        <div class="form-card-head">
+          <h3>Join the waitlist</h3>
+          <p>Tell us about your website and where we can reach you when integration is ready.</p>
+        </div>
+        <form action="https://formspree.io/f/YOUR_UNIQUE_ID" method="POST" class="interest-form">
+          <div class="field-group">
+            <label for="website_url">Website URL</label>
+            <input type="url" id="website_url" name="website_url" placeholder="https://yourwebsite.com" required>
+            <span class="field-hint">The domain or documentation URL where you plan to add FileWhisper search.</span>
+          </div>
+          <div class="field-group">
+            <label for="email">Contact email</label>
+            <input type="email" id="email" name="email" placeholder="you@company.com" required>
+            <span class="field-hint">We'll send integration details and early beta instructions.</span>
+          </div>
+          <button type="submit" class="btn btn-dark submit-btn">
+            <span>Request early access</span>
+            <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor">
+              <path d="M8.22 2.97a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06l2.97-2.97H3.75a.75.75 0 0 1 0-1.5h7.44L8.22 4.03a.75.75 0 0 1 0-1.06Z"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </div><!-- /view-web -->
+
+  <!-- ============================ SHARED ============================ -->
   <section class="wrap" id="team">
     <div class="sec-head">
       <div class="k">Team</div>
@@ -293,7 +602,7 @@
       <div class="member">
         <div class="member-avatar">
           <span class="avatar-initials">IK</span>
-          <img src="ishan.jpg" onerror="this.onerror=null;this.src='ishan.png';this.onerror=function(){this.style.display='none'};" alt="Ishan Kanodia">
+          <img src="ishan.jpg?v=2" onerror="this.onerror=null;this.src='ishan.png';this.onerror=function(){this.style.display='none'};" alt="Ishan Kanodia">
         </div>
         <div class="role">Co-founder</div>
         <div class="name">Ishan Kanodia</div>
@@ -309,7 +618,7 @@
       <div class="member">
         <div class="member-avatar">
           <span class="avatar-initials">DB</span>
-          <img src="dev.jpg" onerror="this.onerror=null;this.src='dev.png';this.onerror=function(){this.style.display='none'};" alt="Dev Bawari">
+          <img src="dev.jpg?v=2" onerror="this.onerror=null;this.src='dev.png';this.onerror=function(){this.style.display='none'};" alt="Dev Bawari">
         </div>
         <div class="role">Co-founder</div>
         <div class="name">Dev Bawari</div>
@@ -342,14 +651,41 @@
     <p class="thanks">Special thanks to <strong>Prof. Chetan Mistry</strong> for suggesting the PC use-case.</p>
   </section>
 
-  <div class="wrap"> 
+  <div class="wrap">
     <footer>
-      <span>FileWhisper — local document chat. Built by Ishan Kanodia and Dev Bawari.</span>
-      <a href="interest.html" class="footer-link">FileWhisper for Websites</a>
+      <span>FileWhisper: private AI search for your files and your website. Built by Ishan Kanodia and Dev Bawari.</span>
+      <button class="footer-link" onclick="setView('web')">FileWhisper for Websites</button>
     </footer>
   </div>
 
   <script>
+    const $ = id => document.getElementById(id);
+
+    /* ---- Desktop | Web view switch (single page, hash-routed) ---- */
+    function setView(v, updateHash = true){
+      const web = v === "web";
+      $("view-desktop").hidden = web;
+      $("view-web").hidden = !web;
+      $("swDesktop").classList.toggle("active", !web);
+      $("swWeb").classList.toggle("active", web);
+      $("navSecondary").textContent = web ? "Pricing" : "How it works";
+      $("navSecondary").href = web ? "#pricing" : "#how";
+      $("navCta").textContent = web ? "Join waitlist" : "Install";
+      $("navCta").href = web ? "#waitlist" : "#install";
+      if (updateHash) history.replaceState(null, "", web ? "#web" : "#desktop");
+      if (window.goatcounter && window.goatcounter.count)
+        window.goatcounter.count({ path: location.pathname + (web ? "#web" : "#desktop") });
+    }
+    function goWaitlist(){
+      setView("web");
+      document.getElementById("waitlist").scrollIntoView({ behavior: "smooth" });
+    }
+    addEventListener("hashchange", () => {
+      if (location.hash === "#web") setView("web", false);
+      if (location.hash === "#desktop") setView("desktop", false);
+    });
+
+    /* ---- OS install tabs ---- */
     const CURL = "curl -fsSL https://raw.githubusercontent.com/ishankanodia/FileWhisper/main/install.sh | bash";
     const DATA = {
       mac:     { cmd: CURL, pr:"$", term:"Terminal",
@@ -362,7 +698,6 @@
                  hint:'<b>To open a terminal:</b> press <b>Ctrl + Alt + T</b> (or find “Terminal” in your apps).',
                  step:'On Linux, press Ctrl + Alt + T, or open your Terminal app.' }
     };
-    const $ = id => document.getElementById(id);
     function setOS(os){
       const d = DATA[os];
       $("cmd").textContent = d.cmd; $("pr").textContent = d.pr;
@@ -378,11 +713,31 @@
     }
     document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>setOS(t.dataset.os)));
     setOS(detect());
-    $("copy").addEventListener("click",async()=>{
-      try{await navigator.clipboard.writeText($("cmd").textContent);$("copy").textContent="Copied!";setTimeout(()=>$("copy").textContent="Copy",1500);}
-      catch(e){$("copy").textContent="Copy failed";}
+
+    /* ---- copy buttons (main install + web snippets) ---- */
+    async function copyText(btn, text){
+      try{ await navigator.clipboard.writeText(text); btn.textContent="Copied!"; }
+      catch(e){ btn.textContent="Copy failed"; }
+      setTimeout(()=>btn.textContent="Copy",1500);
+    }
+    $("copy").addEventListener("click",()=>copyText($("copy"),$("cmd").textContent));
+    document.querySelectorAll(".copy[data-copy]").forEach(b=>b.addEventListener("click",()=>copyText(b,b.dataset.copy)));
+
+    /* ---- demo video: fall back to the screenshot until demo.mp4 exists ---- */
+    $("demoSource").addEventListener("error",()=>{
+      $("demoVideo").style.display="none";
+      $("demoFallback").hidden=false;
     });
+
     addEventListener("scroll",()=>$("nav").classList.toggle("scrolled",scrollY>8));
+
+    /* restore view from URL */
+    if (location.hash === "#web" || location.hash === "#waitlist" || location.hash === "#pricing") setView("web", false);
   </script>
+
+  <!-- Analytics: GoatCounter (privacy-friendly, no cookies, free).
+       Register the code "filewhisper" at https://www.goatcounter.com to activate;
+       the dashboard then lives at https://filewhisper.goatcounter.com -->
+  <script data-goatcounter="https://filewhisper.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

@@ -23,7 +23,7 @@ app = FastAPI()
 
 # NOTE: no CORS middleware on purpose. The UI is served from this same origin
 # (index.html uses window.location.origin), so cross-origin access is never
-# needed — and allowing it would let any webpage the user visits read /browse,
+# needed, and allowing it would let any webpage the user visits read /browse,
 # query their documents, or rewrite /llm-config to exfiltrate their API key.
 
 PACKAGE_DIR = Path(__file__).parent
@@ -187,7 +187,7 @@ def clean_text(text: str) -> str:
     text = text.replace('**', '')
     # Normalize "smart"/typographic punctuation to plain ASCII equivalents and
     # drop zero-width characters. Everything else (Hindi, Chinese, accented
-    # names, ...) is kept as-is — answers must survive in any language.
+    # names, ...) is kept as-is; answers must survive in any language.
     _PUNCT = {
         '‘': "'", '’': "'", '‚': "'", '‛': "'",   # single quotes
         '“': '"', '”': '"', '„': '"', '‟': '"',   # double quotes
@@ -354,7 +354,7 @@ def _call_pollinations(prompt: str) -> str:
                     "Free Assistant rate limit reached. Please try again in a few seconds, "
                     "or add your own API key in LLM Settings for higher limits."
                 )
-            last_err = e  # e.g. 403/1010 Cloudflare block — try the GET fallback
+            last_err = e  # e.g. 403/1010 Cloudflare block; try the GET fallback
         except Exception as e:
             last_err = e
 
@@ -563,7 +563,7 @@ def _local_fs_disabled() -> bool:
     """True when browsing/ingesting the server's own filesystem is disabled.
 
     Set FILEWHISPER_DISABLE_BROWSE=1 in hosted deployments (Dockerfile and
-    Procfile do) — otherwise anyone reaching the app can list the server's
+    Procfile do), otherwise anyone reaching the app can list the server's
     directories and index its files.
     """
     return os.getenv("FILEWHISPER_DISABLE_BROWSE", "").strip().lower() in ("1", "true", "yes")

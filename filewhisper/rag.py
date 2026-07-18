@@ -8,7 +8,7 @@ import threading
 # PDF text extraction (lightweight, no PyTorch)
 import fitz  # PyMuPDF
 
-# ONNX-based embeddings — same MiniLM model as before, but no PyTorch
+# ONNX-based embeddings: same MiniLM model as before, but no PyTorch
 from fastembed import TextEmbedding
 
 import logging

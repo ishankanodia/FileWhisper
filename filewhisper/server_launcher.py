@@ -12,7 +12,7 @@ from pathlib import Path
 # NOTE: uvicorn (and the app itself) are imported inside main(), after
 # _ensure_output_streams() has run. Importing them at module level means any
 # import failure under pythonw.exe (no console, stdout/stderr = None) dies
-# before we can write a log line — the app just silently "doesn't open".
+# before we can write a log line; the app just silently "doesn't open".
 
 
 def _state_dir() -> Path:

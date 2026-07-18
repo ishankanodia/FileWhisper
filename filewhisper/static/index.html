@@ -272,7 +272,7 @@
     .panel-title-btn .chevron { margin-left: auto; font-size: 0.92em; transition: transform 0.2s; color: var(--muted); }
     .panel-title-btn .chevron.open { transform: rotate(90deg); }
 
-    /* Collapsible LLM settings body — hidden until toggled open */
+    /* Collapsible LLM settings body, hidden until toggled open */
     .collapsible-content { display: none; }
     .collapsible-content.open { display: block; }
 
@@ -871,7 +871,7 @@
           log.innerHTML = `<div class="log-line err">❌ ${data.error}</div>`;
         } else {
           log.innerHTML = data.details.map(d =>
-            `<div class="log-line ${d.status==='indexed'?'ok':'skip'}">${d.status==='indexed'?'✓':'—'} ${d.file.split('/').pop()} (${d.chunks} chunks)</div>`
+            `<div class="log-line ${d.status==='indexed'?'ok':'skip'}">${d.status==='indexed'?'✓':'·'} ${d.file.split('/').pop()} (${d.chunks} chunks)</div>`
           ).join('');
           loadSources();
         }
