@@ -559,40 +559,40 @@
       <p class="plans-note">Pricing is indicative while we're in early access. Waitlist members lock in early-adopter terms.</p>
     </section>
 
-    <section class="wrap" id="waitlist" style="padding-top:0">
-      <div class="sec-head">
-        <div class="k">Early access</div>
-        <h2>Get it on your website first.</h2>
-      </div>
-      <div class="form-card">
-        <div class="form-card-head">
-          <h3>Join the waitlist</h3>
-          <p>Tell us about your website and where we can reach you when integration is ready.</p>
-        </div>
-        <form action="https://formspree.io/f/YOUR_UNIQUE_ID" method="POST" class="interest-form">
-          <div class="field-group">
-            <label for="website_url">Website URL</label>
-            <input type="url" id="website_url" name="website_url" placeholder="https://yourwebsite.com" required>
-            <span class="field-hint">The domain or documentation URL where you plan to add FileWhisper search.</span>
-          </div>
-          <div class="field-group">
-            <label for="email">Contact email</label>
-            <input type="email" id="email" name="email" placeholder="you@company.com" required>
-            <span class="field-hint">We'll send integration details and early beta instructions.</span>
-          </div>
-          <button type="submit" class="btn btn-dark submit-btn">
-            <span>Request early access</span>
-            <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor">
-              <path d="M8.22 2.97a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06l2.97-2.97H3.75a.75.75 0 0 1 0-1.5h7.44L8.22 4.03a.75.75 0 0 1 0-1.06Z"/>
-            </svg>
-          </button>
-        </form>
-      </div>
-    </section>
-
   </div><!-- /view-web -->
 
   <!-- ============================ SHARED ============================ -->
+  <section class="wrap" id="waitlist" style="padding-top:50px">
+    <div class="sec-head">
+      <div class="k">FileWhisper for Websites</div>
+      <h2>Get it on your website first.</h2>
+    </div>
+    <div class="form-card">
+      <div class="form-card-head">
+        <h3>Join the waitlist</h3>
+        <p>Tell us about your website and where we can reach you when integration is ready.</p>
+      </div>
+      <form action="https://formspree.io/f/xqerqkbj" method="POST" class="interest-form">
+        <div class="field-group">
+          <label for="website_url">Website URL:</label>
+          <input type="url" id="website_url" name="website_url" placeholder="https://yourwebsite.com" required>
+          <span class="field-hint">The domain or documentation URL where you plan to add FileWhisper search.</span>
+        </div>
+        <div class="field-group">
+          <label for="email">Contact Email:</label>
+          <input type="email" id="email" name="email" placeholder="you@company.com" required>
+          <span class="field-hint">We'll send integration details and early beta instructions.</span>
+        </div>
+        <button type="submit" class="btn btn-dark submit-btn">
+          <span>Submit</span>
+          <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor">
+            <path d="M8.22 2.97a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06l2.97-2.97H3.75a.75.75 0 0 1 0-1.5h7.44L8.22 4.03a.75.75 0 0 1 0-1.06Z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </section>
+
   <section class="wrap" id="team">
     <div class="sec-head">
       <div class="k">Team</div>
@@ -677,7 +677,6 @@
         window.goatcounter.count({ path: location.pathname + (web ? "#web" : "#desktop") });
     }
     function goWaitlist(){
-      setView("web");
       document.getElementById("waitlist").scrollIntoView({ behavior: "smooth" });
     }
     addEventListener("hashchange", () => {
