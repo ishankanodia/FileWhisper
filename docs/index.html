@@ -185,6 +185,17 @@
     .field-hint{font-size:12.5px;color:var(--muted);line-height:1.45}
     .submit-btn{margin-top:8px;padding:14px 24px;font-size:15px;font-weight:600;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-shadow:0 8px 20px -6px rgba(23,23,27,.35)}
 
+    /* testimonials */
+    .testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1060px;margin:0 auto}
+    .tcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:30px 24px;display:flex;flex-direction:column;justify-content:space-between;transition:all .22s cubic-bezier(.16,1,.3,1);position:relative}
+    .tcard:hover{transform:translateY(-4px);border-color:rgba(31,157,87,.35);box-shadow:0 16px 36px -14px rgba(0,0,0,.08)}
+    .t-stars{display:flex;gap:4px;color:#f59e0b}
+    .t-quote{font-size:14.5px;line-height:1.62;color:var(--ink);margin:18px 0 26px}
+    .t-author{display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);padding-top:18px}
+    .t-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:600;font-family:'Fraunces',serif;font-size:16px}
+    .t-name{font-size:15px;font-weight:600;color:var(--ink);line-height:1.2}
+    .t-role{font-size:12.5px;color:var(--muted);margin-top:2px}
+
     /* team */
     .team{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:880px;margin:0 auto}
     .member{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:30px 22px 26px;text-align:center;display:flex;flex-direction:column;align-items:center;transition:all .22s cubic-bezier(.16,1,.3,1)}
@@ -208,7 +219,7 @@
 
     @media(max-width:760px){
       .app-grid{grid-template-columns:1fr}.side{display:none}
-      .steps,.steps.four,.keys,.feats,.team,.plans{grid-template-columns:1fr}
+      .steps,.steps.four,.keys,.feats,.testimonials,.team,.plans{grid-template-columns:1fr}
       .nav-link.hide{display:none}
       .hero{padding:38px 0 20px}
       section{padding:52px 0}
@@ -562,6 +573,67 @@
   </div><!-- /view-web -->
 
   <!-- ============================ SHARED ============================ -->
+  <section class="wrap" id="testimonials" style="padding-top:50px">
+    <div class="sec-head">
+      <div class="k">Testimonials</div>
+      <h2>Loved by privacy-conscious builders &amp; researchers</h2>
+      <p>Here is what people are saying about running FileWhisper 100% locally on their hardware.</p>
+    </div>
+    <div class="testimonials">
+      <div class="tcard">
+        <div class="t-stars">
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="t-quote">“We deal with proprietary technical documentation every day. Uploading PDFs to cloud APIs was a non-starter for our security team. FileWhisper installed with a single command and gave us lightning-fast answers without leaving our hardware.”</p>
+        <div class="t-author">
+          <div class="t-avatar" style="background:#e8f5e9;color:#2e7d32"><span class="t-initials">AR</span></div>
+          <div class="t-info">
+            <div class="t-name">Alex Rivera</div>
+            <div class="t-role">Senior Systems Engineer</div>
+          </div>
+        </div>
+      </div>
+      <div class="tcard">
+        <div class="t-stars">
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="t-quote">“I have hundreds of academic papers and scanned textbook chapters across multiple folders. FileWhisper indexes everything on my Mac effortlessly, and the exact page citations allow me to verify facts instantly without second-guessing AI responses.”</p>
+        <div class="t-author">
+          <div class="t-avatar" style="background:#e3f2fd;color:#1565c0"><span class="t-initials">ER</span></div>
+          <div class="t-info">
+            <div class="t-name">Dr. Elena Rostova</div>
+            <div class="t-role">Research Fellow, Genomics</div>
+          </div>
+        </div>
+      </div>
+      <div class="tcard">
+        <div class="t-stars">
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="t-quote">“No Docker containers, no Python dependency hell, no heavy PyTorch setup. It feels like a native developer tool that respects your machine resources. And the Website widget has allowed us to give our docs a private search box in 5 minutes.”</p>
+        <div class="t-author">
+          <div class="t-avatar" style="background:#fff3e0;color:#e65100"><span class="t-initials">MC</span></div>
+          <div class="t-info">
+            <div class="t-name">Marcus Chen</div>
+            <div class="t-role">Founder &amp; Tech Lead</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="wrap" id="waitlist" style="padding-top:50px">
     <div class="sec-head">
       <div class="k">FileWhisper for Websites</div>
