@@ -106,7 +106,7 @@ docs/                           Website (GitHub Pages) + screenshot
 
 ## Privacy & analytics
 
-Your documents and questions never leave your machine except for the final LLM call (which you control: use the free local provider for zero external calls).
+Your documents never leave your machine. Parsing, OCR, embedding and vector search are entirely local; the only outbound request is the final LLM call, which sends your question plus the matched snippets to whichever provider you selected. Every provider, including the free keyless one, is a remote API, so "no API key" does not mean "no network call".
 
 The **installer** sends a single anonymous ping on install (operating system + version only, no personal data, no file info, no identifiers) so we can gauge how many people use FileWhisper. To opt out, set either environment variable before installing:
 

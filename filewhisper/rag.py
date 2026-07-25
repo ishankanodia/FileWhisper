@@ -65,6 +65,10 @@ def _ocr_image(src) -> str:
         return ""
     return " ".join(line[1] for line in result)
 
+# File types we can extract text from. Single source of truth: main.py imports
+# this for /browse so the picker never offers a file that ingest would skip.
+SUPPORTED_EXTENSIONS = {".txt", ".md", ".pdf", ".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff"}
+
 # Persistence paths
 DATA_DIR = os.getenv("RAG_DATA_DIR", os.path.expanduser("~/.filewhisper/rag_data"))
 INDEX_PATH = os.path.join(DATA_DIR, "index.faiss")
@@ -238,15 +242,13 @@ def ingest_path(path: str) -> dict:
     """Ingest a file or entire folder recursively."""
     results = []
 
-    SUPPORTED = {".txt", ".md", ".pdf", ".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff"}
-
     if os.path.isfile(path):
         files = [path]
     elif os.path.isdir(path):
         files = []
         for root, _, fnames in os.walk(path):
             for fname in fnames:
-                if os.path.splitext(fname)[1].lower() in SUPPORTED:
+                if os.path.splitext(fname)[1].lower() in SUPPORTED_EXTENSIONS:
                     files.append(os.path.join(root, fname))
     else:
         return {"error": "Invalid path"}

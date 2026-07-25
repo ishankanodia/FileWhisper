@@ -2,7 +2,13 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from .rag import ingest_path, retrieve, get_indexed_sources, clear_index
+from .rag import (
+    SUPPORTED_EXTENSIONS,
+    clear_index,
+    get_indexed_sources,
+    ingest_path,
+    retrieve,
+)
 
 import json
 import re
@@ -354,6 +360,16 @@ def _call_pollinations(prompt: str) -> str:
                     "Free Assistant rate limit reached. Please try again in a few seconds, "
                     "or add your own API key in LLM Settings for higher limits."
                 )
+            if e.code == 402:
+                # Pollinations is deprecating its keyless legacy API: prompts
+                # beyond a few hundred characters (i.e. any real question with
+                # document context) now come back 402. Retrying and the GET
+                # fallback hit the same wall, so fail fast with the real reason.
+                raise RuntimeError(
+                    "The free keyless assistant is no longer accepting questions this long "
+                    "(its provider now requires an account for them). Open LLM Settings and "
+                    "add an API key from any provider to keep asking questions."
+                )
             last_err = e  # e.g. 403/1010 Cloudflare block; try the GET fallback
         except Exception as e:
             last_err = e
@@ -599,8 +615,6 @@ def browse(path: str = ""):
     if not os.path.exists(path) or not os.path.isdir(path):
         raise HTTPException(status_code=400, detail="Invalid directory")
 
-    SUPPORTED = {".txt", ".md", ".pdf", ".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff"}
-
     entries = []
     try:
         for name in sorted(os.listdir(path)):
@@ -609,7 +623,7 @@ def browse(path: str = ""):
             full = os.path.join(path, name)
             if os.path.isdir(full):
                 entries.append({"name": name, "path": full, "type": "dir"})
-            elif os.path.splitext(name)[1].lower() in SUPPORTED:
+            elif os.path.splitext(name)[1].lower() in SUPPORTED_EXTENSIONS:
                 entries.append({"name": name, "path": full, "type": "file",
                                  "ext": os.path.splitext(name)[1].lower()})
     except PermissionError:

@@ -706,7 +706,9 @@
     const PROVIDER_DEFAULTS = {
       "free-huggingface": {
         model: "mistralai/Mistral-7B-Instruct-v0.3",
-        baseUrl: "https://router.huggingface.co/hf-inference/models",
+        // Router /v1 (OpenAI-compatible). The old /hf-inference/models endpoint
+        // 400s for most models; keep this in sync with PROVIDER_DEFAULTS in main.py.
+        baseUrl: "https://router.huggingface.co/v1",
         models: [
           "mistralai/Mistral-7B-Instruct-v0.3",
           "HuggingFaceH4/zephyr-7b-beta"

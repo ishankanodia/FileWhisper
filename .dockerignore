@@ -10,5 +10,5 @@ rag_data/
 *.log
 build/
 dist/
-src-tauri/target/
-node_modules/
+*.egg-info/
+docs/

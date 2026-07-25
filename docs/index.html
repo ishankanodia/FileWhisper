@@ -185,17 +185,6 @@
     .field-hint{font-size:12.5px;color:var(--muted);line-height:1.45}
     .submit-btn{margin-top:8px;padding:14px 24px;font-size:15px;font-weight:600;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-shadow:0 8px 20px -6px rgba(23,23,27,.35)}
 
-    /* testimonials */
-    .testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1060px;margin:0 auto}
-    .tcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:30px 24px;display:flex;flex-direction:column;justify-content:space-between;transition:all .22s cubic-bezier(.16,1,.3,1);position:relative}
-    .tcard:hover{transform:translateY(-4px);border-color:rgba(31,157,87,.35);box-shadow:0 16px 36px -14px rgba(0,0,0,.08)}
-    .t-stars{display:flex;gap:4px;color:#f59e0b}
-    .t-quote{font-size:14.5px;line-height:1.62;color:var(--ink);margin:18px 0 26px}
-    .t-author{display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);padding-top:18px}
-    .t-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:600;font-family:'Fraunces',serif;font-size:16px}
-    .t-name{font-size:15px;font-weight:600;color:var(--ink);line-height:1.2}
-    .t-role{font-size:12.5px;color:var(--muted);margin-top:2px}
-
     /* team */
     .team{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:880px;margin:0 auto}
     .member{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:30px 22px 26px;text-align:center;display:flex;flex-direction:column;align-items:center;transition:all .22s cubic-bezier(.16,1,.3,1)}
@@ -219,7 +208,7 @@
 
     @media(max-width:760px){
       .app-grid{grid-template-columns:1fr}.side{display:none}
-      .steps,.steps.four,.keys,.feats,.testimonials,.team,.plans{grid-template-columns:1fr}
+      .steps,.steps.four,.keys,.feats,.team,.plans{grid-template-columns:1fr}
       .nav-link.hide{display:none}
       .hero{padding:38px 0 20px}
       section{padding:52px 0}
@@ -570,119 +559,65 @@
       <p class="plans-note">Pricing is indicative while we're in early access. Waitlist members lock in early-adopter terms.</p>
     </section>
 
+    <!-- Waitlist lives inside this view only: the Desktop app is already
+         shipping and free, so the main page must not ask people to wait. -->
+    <section class="wrap" id="waitlist">
+      <div class="sec-head">
+        <div class="k">Early access</div>
+        <h2>Get it on your website first.</h2>
+      </div>
+      <div class="form-card">
+        <div class="form-card-head">
+          <h3>Join the waitlist</h3>
+          <p>Tell us about your website and where we can reach you when integration is ready.</p>
+        </div>
+        <form action="https://formspree.io/f/xqerqkbj" method="POST" class="interest-form">
+          <div class="field-group">
+            <label for="website_url">Website URL:</label>
+            <input type="url" id="website_url" name="website_url" placeholder="https://yourwebsite.com" required>
+            <span class="field-hint">The domain or documentation URL where you plan to add FileWhisper search.</span>
+          </div>
+          <div class="field-group">
+            <label for="email">Contact Email:</label>
+            <input type="email" id="email" name="email" placeholder="you@company.com" required>
+            <span class="field-hint">We'll send integration details and early beta instructions.</span>
+          </div>
+          <button type="submit" class="btn btn-dark submit-btn">
+            <span>Submit</span>
+            <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor">
+              <path d="M8.22 2.97a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06l2.97-2.97H3.75a.75.75 0 0 1 0-1.5h7.44L8.22 4.03a.75.75 0 0 1 0-1.06Z"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </section>
+
   </div><!-- /view-web -->
 
   <!-- ============================ SHARED ============================ -->
-  <section class="wrap" id="testimonials" style="padding-top:50px">
-    <div class="sec-head">
-      <div class="k">Testimonials</div>
-      <h2>Loved by privacy-conscious builders &amp; researchers</h2>
-      <p>Here is what people are saying about running FileWhisper 100% locally on their hardware.</p>
-    </div>
-    <div class="testimonials">
-      <div class="tcard">
-        <div class="t-stars">
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-        </div>
-        <p class="t-quote">“We deal with proprietary technical documentation every day. Uploading PDFs to cloud APIs was a non-starter for our security team. FileWhisper installed with a single command and gave us lightning-fast answers without leaving our hardware.”</p>
-        <div class="t-author">
-          <div class="t-avatar" style="background:#e8f5e9;color:#2e7d32"><span class="t-initials">AR</span></div>
-          <div class="t-info">
-            <div class="t-name">Alex Rivera</div>
-            <div class="t-role">Senior Systems Engineer</div>
-          </div>
-        </div>
-      </div>
-      <div class="tcard">
-        <div class="t-stars">
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-        </div>
-        <p class="t-quote">“I have hundreds of academic papers and scanned textbook chapters across multiple folders. FileWhisper indexes everything on my Mac effortlessly, and the exact page citations allow me to verify facts instantly without second-guessing AI responses.”</p>
-        <div class="t-author">
-          <div class="t-avatar" style="background:#e3f2fd;color:#1565c0"><span class="t-initials">ER</span></div>
-          <div class="t-info">
-            <div class="t-name">Dr. Elena Rostova</div>
-            <div class="t-role">Research Fellow, Genomics</div>
-          </div>
-        </div>
-      </div>
-      <div class="tcard">
-        <div class="t-stars">
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-        </div>
-        <p class="t-quote">“No Docker containers, no Python dependency hell, no heavy PyTorch setup. It feels like a native developer tool that respects your machine resources. And the Website widget has allowed us to give our docs a private search box in 5 minutes.”</p>
-        <div class="t-author">
-          <div class="t-avatar" style="background:#fff3e0;color:#e65100"><span class="t-initials">MC</span></div>
-          <div class="t-info">
-            <div class="t-name">Marcus Chen</div>
-            <div class="t-role">Founder &amp; Tech Lead</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="wrap" id="waitlist" style="padding-top:50px">
-    <div class="sec-head">
-      <div class="k">FileWhisper for Websites</div>
-      <h2>Get it on your website first.</h2>
-    </div>
-    <div class="form-card">
-      <div class="form-card-head">
-        <h3>Join the waitlist</h3>
-        <p>Tell us about your website and where we can reach you when integration is ready.</p>
-      </div>
-      <form action="https://formspree.io/f/xqerqkbj" method="POST" class="interest-form">
-        <div class="field-group">
-          <label for="website_url">Website URL:</label>
-          <input type="url" id="website_url" name="website_url" placeholder="https://yourwebsite.com" required>
-          <span class="field-hint">The domain or documentation URL where you plan to add FileWhisper search.</span>
-        </div>
-        <div class="field-group">
-          <label for="email">Contact Email:</label>
-          <input type="email" id="email" name="email" placeholder="you@company.com" required>
-          <span class="field-hint">We'll send integration details and early beta instructions.</span>
-        </div>
-        <button type="submit" class="btn btn-dark submit-btn">
-          <span>Submit</span>
-          <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor">
-            <path d="M8.22 2.97a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06l2.97-2.97H3.75a.75.75 0 0 1 0-1.5h7.44L8.22 4.03a.75.75 0 0 1 0-1.06Z"/>
-          </svg>
-        </button>
-      </form>
-    </div>
-  </section>
-
   <section class="wrap" id="team">
     <div class="sec-head">
       <div class="k">Team</div>
       <h2>The people behind FileWhisper</h2>
     </div>
+    <!-- One copy of the LinkedIn glyph, referenced by each card below. -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <symbol id="ic-linkedin" viewBox="0 0 24 24">
+        <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5V13.2a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2v-8.37H6.46M7.83 6.5A1.63 1.63 0 0 0 6.2 8.13a1.63 1.63 0 0 0 1.63 1.63 1.63 1.63 0 0 0 1.63-1.63A1.63 1.63 0 0 0 7.83 6.5Z"/>
+      </symbol>
+    </svg>
     <div class="team">
       <div class="member">
+        <!-- onerror drops the photo so the initials underneath show through. -->
         <div class="member-avatar">
           <span class="avatar-initials">IK</span>
-          <img src="ishan.jpg?v=2" onerror="this.onerror=null;this.src='ishan.png';this.onerror=function(){this.style.display='none'};" alt="Ishan Kanodia">
+          <img src="ishan.jpg" onerror="this.remove()" alt="Ishan Kanodia">
         </div>
         <div class="role">Co-founder</div>
         <div class="name">Ishan Kanodia</div>
         <div class="member-social">
-          <a href="https://www.linkedin.com/in/ishan-kanodia" target="_blank" rel="noopener noreferrer" class="social-link linkedin" aria-label="Ishan Kanodia LinkedIn Profile">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5V13.2a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2v-8.37H6.46M7.83 6.5A1.63 1.63 0 0 0 6.2 8.13a1.63 1.63 0 0 0 1.63 1.63 1.63 1.63 0 0 0 1.63-1.63A1.63 1.63 0 0 0 7.83 6.5Z"/>
-            </svg>
+          <a href="https://www.linkedin.com/in/ishan-kanodia" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Ishan Kanodia on LinkedIn">
+            <svg width="15" height="15" fill="currentColor"><use href="#ic-linkedin"/></svg>
             <span>LinkedIn</span>
           </a>
         </div>
@@ -690,15 +625,13 @@
       <div class="member">
         <div class="member-avatar">
           <span class="avatar-initials">DB</span>
-          <img src="dev.jpg?v=2" onerror="this.onerror=null;this.src='dev.png';this.onerror=function(){this.style.display='none'};" alt="Dev Bawari">
+          <img src="dev.jpg" onerror="this.remove()" alt="Dev Bawari">
         </div>
         <div class="role">Co-founder</div>
         <div class="name">Dev Bawari</div>
         <div class="member-social">
-          <a href="https://www.linkedin.com/in/dev-bawari-4a4341250" target="_blank" rel="noopener noreferrer" class="social-link linkedin" aria-label="Dev Bawari LinkedIn Profile">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5V13.2a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2v-8.37H6.46M7.83 6.5A1.63 1.63 0 0 0 6.2 8.13a1.63 1.63 0 0 0 1.63 1.63 1.63 1.63 0 0 0 1.63-1.63A1.63 1.63 0 0 0 7.83 6.5Z"/>
-            </svg>
+          <a href="https://www.linkedin.com/in/dev-bawari-4a4341250" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Dev Bawari on LinkedIn">
+            <svg width="15" height="15" fill="currentColor"><use href="#ic-linkedin"/></svg>
             <span>LinkedIn</span>
           </a>
         </div>
@@ -706,15 +639,13 @@
       <div class="member">
         <div class="member-avatar">
           <span class="avatar-initials">AG</span>
-          <img src="amardip.png" onerror="this.onerror=null;this.src='amardip.png';this.onerror=function(){this.style.display='none'};" alt="Prof. Amardip Ghosh">
+          <img src="amardip.png" onerror="this.remove()" alt="Prof. Amardip Ghosh">
         </div>
         <div class="role">Mentor</div>
         <div class="name">Prof. Amardip Ghosh</div>
         <div class="member-social">
-          <a href="https://www.linkedin.com/in/amardip-ghosh-20865224/" target="_blank" rel="noopener noreferrer" class="social-link linkedin" aria-label="Prof. Amardip Ghosh LinkedIn Profile">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5V13.2a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2v-8.37H6.46M7.83 6.5A1.63 1.63 0 0 0 6.2 8.13a1.63 1.63 0 0 0 1.63 1.63 1.63 1.63 0 0 0 1.63-1.63A1.63 1.63 0 0 0 7.83 6.5Z"/>
-            </svg>
+          <a href="https://www.linkedin.com/in/amardip-ghosh-20865224/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Prof. Amardip Ghosh on LinkedIn">
+            <svg width="15" height="15" fill="currentColor"><use href="#ic-linkedin"/></svg>
             <span>LinkedIn</span>
           </a>
         </div>
