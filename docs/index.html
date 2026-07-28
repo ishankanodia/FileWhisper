@@ -148,10 +148,6 @@
     .feat h4{font-size:15px;font-weight:600;margin-bottom:8px}
     .feat p{font-size:13.5px;color:var(--muted);line-height:1.6}
 
-    /* web view: script snippet */
-    .snippet{max-width:680px;margin:0 auto}
-    .snippet .lbl{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:26px 0 10px;text-align:left}
-    .snippet .lbl:first-child{margin-top:0}
 
     /* pricing */
     .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch}
@@ -233,7 +229,7 @@
   <!-- Desktop | Web product switch -->
   <div class="wrap switch-bar">
     <div class="switch" role="tablist" aria-label="Choose product">
-      <button id="swDesktop" class="active" onclick="setView('desktop')">For Desktop</button>
+      <button id="swDesktop" class="active" onclick="setView('desktop')">For Desktops</button>
       <button id="swWeb" onclick="setView('web')">For Websites</button>
     </div>
   </div>
@@ -473,24 +469,6 @@
           <p>Copy the snippet it gives you into your site's HTML. The AI search box appears instantly.</p>
           <span class="term mono">&lt;script&gt;</span>
         </div>
-      </div>
-    </section>
-
-    <section class="wrap" style="padding-top:0">
-      <div class="snippet">
-        <p class="lbl">On your server</p>
-        <div class="cmd">
-          <span class="pr mono">$</span>
-          <code class="mono">curl -fsSL https://filewhisper.in/install.sh | bash</code>
-          <button class="copy" data-copy="curl -fsSL https://filewhisper.in/install.sh | bash">Copy</button>
-        </div>
-        <p class="lbl">Then, in your site's HTML</p>
-        <div class="cmd">
-          <span class="pr mono">&gt;</span>
-          <code class="mono">&lt;script src="https://yoursite.com/filewhisper.js"&gt;&lt;/script&gt;</code>
-          <button class="copy" data-copy='<script src="https://yoursite.com/filewhisper.js"></script>'>Copy</button>
-        </div>
-        <p class="free-note" style="text-align:center">That's it. Developers trust search boxes, and your visitors already know how to use one.</p>
       </div>
     </section>
 
