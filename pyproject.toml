@@ -24,6 +24,10 @@ dependencies = [
     "langgraph",
     "PyMuPDF",
     "rapidocr-onnxruntime",
+    "huggingface_hub",
+    # Built-in local LLM. No wheel for Python 3.10 or Intel macOS; on those the
+    # app falls back to a detected Ollama/LM Studio server or the offline reader.
+    'onnxruntime-genai>=0.9.0; python_version >= "3.11" and (sys_platform != "darwin" or platform_machine != "x86_64")',
 ]
 
 [project.scripts]

@@ -4,6 +4,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 # Hosted mode: never let visitors browse or ingest the container's filesystem.
 ENV FILEWHISPER_DISABLE_BROWSE=1
+# Hosted mode: don't pull a multi-GB model onto a server or burn its CPU on
+# generation. Hosted deployments use an API-key provider instead.
+ENV FILEWHISPER_DISABLE_LOCAL_LLM=1
 
 WORKDIR /app
 

@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from . import local_llm
 from .rag import (
     SUPPORTED_EXTENSIONS,
     clear_index,
@@ -11,6 +12,7 @@ from .rag import (
 )
 
 import json
+import logging
 import re
 import os
 import threading
@@ -24,6 +26,8 @@ from dotenv import load_dotenv
 from langgraph.graph import StateGraph
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -55,15 +59,41 @@ class LLMConfigRequest(BaseModel):
     base_url: Optional[str] = None
 
 
+class LocalModelRequest(BaseModel):
+    model_id: str
+
+
 # =========================
 # Utils
 # =========================
+# `requires_key` is what lets the fully local providers work with no key at all;
+# everything else must present one before call_llm will attempt a request.
 PROVIDER_DEFAULTS = {
+    # Default. Runs an int4 instruct model on this machine via onnxruntime-genai,
+    # so document text never leaves it. `model` is a MODEL_CATALOG id, not a
+    # remote model name.
+    "local": {
+        "model": local_llm.DEFAULT_MODEL,
+        "base_url": "",
+        "api_key_env": "",
+        "api_style": "local",
+        "requires_key": False,
+    },
+    # A local server the user already runs (Ollama, LM Studio, llama.cpp, Jan).
+    # Still fully private; base_url is replaced by whatever we actually detect.
+    "ollama": {
+        "model": "llama3.2",
+        "base_url": "http://127.0.0.1:11434/v1",
+        "api_key_env": "OLLAMA_API_KEY",
+        "api_style": "openai",
+        "requires_key": False,
+    },
     "free-huggingface": {
         "model": "mistralai/Mistral-7B-Instruct-v0.3",
         "base_url": "https://router.huggingface.co/v1",
         "api_key_env": "HF_API_KEY",
         "api_style": "huggingface",
+        "requires_key": False,
     },
     "groq": {
         "model": "llama-3.3-70b-versatile",
@@ -99,7 +129,7 @@ PROVIDER_DEFAULTS = {
 
 
 llm_config = {
-    "provider": os.getenv("LLM_PROVIDER", "free-huggingface").lower(),
+    "provider": os.getenv("LLM_PROVIDER", "local").lower(),
     "model": os.getenv("LLM_MODEL", ""),
     "base_url": os.getenv("LLM_BASE_URL", ""),
     "api_keys": {
@@ -109,6 +139,7 @@ llm_config = {
         "anthropic": os.getenv("ANTHROPIC_API_KEY", ""),
         "gemini": os.getenv("GEMINI_API_KEY", ""),
         "custom": os.getenv("LLM_API_KEY", ""),
+        "ollama": os.getenv("OLLAMA_API_KEY", ""),
     },
 }
 
@@ -155,7 +186,7 @@ def _save_llm_config():
 
 
 def _normalize_provider(provider: str) -> str:
-    provider = (provider or "free-huggingface").strip().lower()
+    provider = (provider or "local").strip().lower()
     return provider if provider in PROVIDER_DEFAULTS else "custom"
 
 
@@ -163,16 +194,31 @@ _load_saved_llm_config()
 
 
 def _effective_llm_config() -> dict:
-    provider = _normalize_provider(llm_config.get("provider", "free-huggingface"))
+    provider = _normalize_provider(llm_config.get("provider", "local"))
     defaults = PROVIDER_DEFAULTS[provider]
-    api_key = llm_config["api_keys"].get(provider) or os.getenv(defaults["api_key_env"], "")
+    key_env = defaults["api_key_env"]
+    api_key = llm_config["api_keys"].get(provider) or (os.getenv(key_env, "") if key_env else "")
+    base_url = (llm_config.get("base_url") or defaults["base_url"]).rstrip("/")
+
+    # Ollama and friends move between ports; prefer whichever local server is
+    # actually answering right now over a stale saved base_url.
+    if provider == "ollama":
+        detected = local_llm.detect_external_runtime()
+        if detected:
+            base_url = detected["base_url"].rstrip("/")
+
+    model = llm_config.get("model") or defaults["model"]
+    if provider == "local" and model not in local_llm.MODEL_CATALOG:
+        # Switching from a remote provider leaves its model name behind.
+        model = defaults["model"]
 
     return {
         "provider": provider,
-        "model": llm_config.get("model") or defaults["model"],
+        "model": model,
         "api_key": api_key,
-        "base_url": (llm_config.get("base_url") or defaults["base_url"]).rstrip("/"),
+        "base_url": base_url,
         "api_style": defaults["api_style"],
+        "requires_key": defaults.get("requires_key", True),
     }
 
 
@@ -183,6 +229,7 @@ def public_llm_config() -> dict:
         "model": cfg["model"],
         "base_url": cfg["base_url"],
         "has_api_key": bool(cfg["api_key"]),
+        "is_local": cfg["api_style"] == "local" or cfg["provider"] == "ollama",
     }
 
 
@@ -284,11 +331,13 @@ def _call_openai_compatible(cfg: dict, prompt: str, max_tokens: int) -> str:
     else:
         payload["max_tokens"] = max_tokens
         payload["temperature"] = 0.5
-    data = _post_json(
-        f"{cfg['base_url']}/chat/completions",
-        payload,
-        {"Authorization": f"Bearer {cfg['api_key']}"},
-    )
+    # Ollama/llama.cpp accept no key at all; sending an empty bearer token makes
+    # some of them 401 instead of just ignoring it.
+    headers = {"Authorization": f"Bearer {cfg['api_key']}"} if cfg.get("api_key") else {}
+    # A local model on CPU is far slower than a hosted one, and the default
+    # 60s budget expires mid-answer on a laptop.
+    timeout = 300 if _is_loopback(cfg.get("base_url", "")) else 60
+    data = _post_json(f"{cfg['base_url']}/chat/completions", payload, headers, timeout=timeout)
     return data["choices"][0]["message"]["content"].strip()
 
 
@@ -446,13 +495,49 @@ def _call_free_huggingface(cfg: dict, prompt: str, max_tokens: int) -> str:
         raise RuntimeError(f"Hugging Face API error: {e}")
 
 
+def _is_loopback(base_url: str) -> bool:
+    host = urllib.parse.urlparse(base_url).hostname or ""
+    return host in ("127.0.0.1", "localhost", "::1", "0.0.0.0")
+
+
 def call_llm(prompt: str, max_tokens=400):
     cfg = _effective_llm_config()
-    
+
+    # Fully local: the built-in ONNX model. Nothing is sent anywhere.
+    if cfg["api_style"] == "local":
+        if local_llm.local_llm_disabled() or not local_llm.engine_available():
+            raise RuntimeError(local_llm.engine_unavailable_reason())
+        if not local_llm.is_downloaded(cfg["model"]):
+            # Don't make the first question a dead end: start the one-time setup
+            # now and let the offline reader answer from the documents meanwhile.
+            entry = local_llm.MODEL_CATALOG.get(cfg["model"], {})
+            state = local_llm.download_state()
+            if state["status"] != "downloading":
+                try:
+                    state = local_llm.start_download(cfg["model"])
+                except Exception as e:
+                    raise RuntimeError(
+                        f"The local model is not set up yet and the download could not "
+                        f"start: {e}"
+                    )
+            done, total = state.get("downloaded_mb", 0), state.get("total_mb", 0)
+            raise RuntimeError(
+                f"Setting up the local model ({entry.get('label', cfg['model'])}, "
+                f"{total} MB, {done:.0f} MB so far). It downloads once and then everything "
+                "runs on this computer. Ask again when LLM Settings shows it ready."
+            )
+        return local_llm.generate(prompt, max_tokens, cfg["model"])
+
     if cfg["provider"] == "free-huggingface" or cfg["api_style"] == "huggingface":
         return _call_free_huggingface(cfg, prompt, max_tokens)
 
-    if not cfg["api_key"]:
+    if cfg["provider"] == "ollama" and not local_llm.detect_external_runtime():
+        raise RuntimeError(
+            "No local model server is answering. Start Ollama (or LM Studio / llama.cpp), "
+            "or switch to the built-in local model in LLM Settings."
+        )
+
+    if not cfg["api_key"] and cfg.get("requires_key", True):
         raise RuntimeError(
             "No LLM API key configured. Set the provider key in .env or deployment secrets."
         )
@@ -466,15 +551,31 @@ def call_llm(prompt: str, max_tokens=400):
     return _call_openai_compatible(cfg, prompt, max_tokens)
 
 
+def _engine_label() -> str:
+    """Short, user-facing name for whatever answered, so the UI can show whether
+    the question stayed on this machine."""
+    cfg = _effective_llm_config()
+    if cfg["api_style"] == "local":
+        entry = local_llm.MODEL_CATALOG.get(cfg["model"], {})
+        return f"local:{entry.get('label', cfg['model'])}"
+    if cfg["provider"] == "ollama":
+        detected = local_llm.detect_external_runtime()
+        return f"local:{detected.get('name', 'Ollama')} ({cfg['model']})"
+    return f"cloud:{cfg['provider']} ({cfg['model']})"
+
+
 # =========================
 # LangGraph
 # =========================
 class GraphState(TypedDict, total=False):
     question: str
     context: str
+    chunks: list      # raw retrieved chunks, kept for the offline reader fallback
     answer: str
     follow_up: str
     sources: list
+    engine: str       # which engine actually produced the answer
+    engine_note: str  # user-facing explanation when we had to fall back
 
 
 def retrieve_node(state: GraphState):
@@ -495,7 +596,7 @@ def retrieve_node(state: GraphState):
             seen.add(r[1])
             src_files.append(r[1])
     context = "\n\n---\n\n".join(chunks)
-    return {"context": context, "sources": src_files}
+    return {"context": context, "chunks": chunks, "sources": src_files}
 
 
 def answer_node(state: GraphState):
@@ -522,13 +623,26 @@ Question:
 
 Answer:
 """
-    answer = call_llm(prompt)
-    answer = clean_text(answer)
-    return {"answer": answer}
+    try:
+        answer = clean_text(call_llm(prompt))
+        if not answer:
+            raise RuntimeError("The model returned an empty answer.")
+        return {"answer": answer, "engine": _engine_label()}
+    except Exception as e:
+        # Never leave the user with nothing: fall back to the offline reader,
+        # which needs no model and no network, and say why.
+        logger.warning("Answer generation failed (%s); using the offline reader.", e)
+        fallback = clean_text(local_llm.extractive_answer(state["question"], state.get("chunks") or []))
+        return {"answer": fallback, "engine": "offline-reader", "engine_note": str(e)[:300]}
 
 
 def followup_node(state: GraphState):
-    if not state.get("answer"):
+    # Skip when there is no real answer to build on, when the offline reader
+    # produced it (there is no model to ask), or when the user turned it off to
+    # halve the work a slow local model has to do.
+    if not state.get("answer") or state.get("engine") == "offline-reader":
+        return {}
+    if os.getenv("FILEWHISPER_FOLLOWUP", "").strip().lower() in ("0", "false", "no"):
         return {}
 
     prompt = f"""
@@ -547,8 +661,12 @@ Answer:
 
 Leading question:
 """
-    follow = call_llm(prompt, max_tokens=60)
-    follow = clean_text(follow)
+    try:
+        follow = clean_text(call_llm(prompt, max_tokens=60))
+    except Exception as e:
+        # A failed follow-up must never discard a good answer.
+        logger.warning("Follow-up generation failed: %s", e)
+        return {}
     if len(follow.split()) < 5:
         follow = "Would you like to explore any of the concepts mentioned above?"
     return {"follow_up": follow}
@@ -681,6 +799,8 @@ def set_llm_config(req: LLMConfigRequest):
         raise HTTPException(status_code=400, detail="Model is required")
     if provider == "custom" and not (req.base_url or "").strip():
         raise HTTPException(status_code=400, detail="Base URL is required for custom providers")
+    if provider == "local" and req.model.strip() not in local_llm.MODEL_CATALOG:
+        raise HTTPException(status_code=400, detail=f"Unknown local model: {req.model.strip()}")
 
     llm_config["provider"] = provider
     llm_config["model"] = req.model.strip()
@@ -689,6 +809,42 @@ def set_llm_config(req: LLMConfigRequest):
         llm_config["api_keys"][provider] = req.api_key.strip()
     _save_llm_config()
     return public_llm_config()
+
+
+@app.get("/local-status")
+def local_status():
+    """Everything the UI needs to show the local-model panel: what is installed,
+    what a download would cost, and whether another local server is running."""
+    catalog = []
+    for model_id, entry in local_llm.MODEL_CATALOG.items():
+        catalog.append({
+            "id": model_id,
+            "label": entry["label"],
+            "size_mb": entry["size_mb"],
+            "license": entry["license"],
+            "description": entry["description"],
+            "downloaded": local_llm.is_downloaded(model_id),
+        })
+    available = local_llm.engine_available() and not local_llm.local_llm_disabled()
+    return {
+        "engine_available": available,
+        "reason": "" if available else local_llm.engine_unavailable_reason(),
+        "default_model": local_llm.DEFAULT_MODEL,
+        "models": catalog,
+        "download": local_llm.download_state(),
+        "external": local_llm.detect_external_runtime(),
+    }
+
+
+@app.post("/local-download")
+def local_download(req: LocalModelRequest):
+    """Start downloading a local model. Returns immediately; poll /local-status."""
+    try:
+        return local_llm.start_download(req.model_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
 
 
 @app.post("/ask")
@@ -700,6 +856,12 @@ def ask(q: Query):
         src_files = result.get("sources", [])
         # Return just filenames, not full paths
         filenames = [os.path.basename(s) for s in src_files]
-        return {"answer": answer, "follow_up": follow, "sources": filenames}
+        return {
+            "answer": answer,
+            "follow_up": follow,
+            "sources": filenames,
+            "engine": result.get("engine", ""),
+            "engine_note": result.get("engine_note", ""),
+        }
     except Exception as e:
-        return {"answer": f"Error: {str(e)}", "follow_up": "", "sources": []}
+        return {"answer": f"Error: {str(e)}", "follow_up": "", "sources": [], "engine": ""}

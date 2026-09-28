@@ -107,7 +107,7 @@ else
 fi
 
 # 4. Build an isolated environment and install dependencies (no PyTorch).
-echo "-> Setting up (downloads ~400 MB the first time, please wait)..."
+echo "-> Setting up (downloads ~500 MB the first time, please wait)..."
 "$PYTHON" -m venv "$VENV"
 "$VENV/bin/python" -m pip install --quiet --upgrade pip
 "$VENV/bin/python" -m pip install --quiet -r "$APP_DIR/requirements.txt"
@@ -128,6 +128,16 @@ try:
 except Exception as e:
     print("   (OCR warmup skipped:", e, ")")
 PY
+
+# 5b. Pre-download the on-device language model, so the very first question is
+# answered locally with no wait. Opt out with FILEWHISPER_SKIP_MODEL=1; the app
+# then fetches it on demand (with a progress bar) the first time it is asked.
+if [ -z "$FILEWHISPER_SKIP_MODEL" ]; then
+  echo "-> Downloading the on-device language model (about 1.4 GB, one time)."
+  echo "   Your documents stay on this computer. Skip with FILEWHISPER_SKIP_MODEL=1."
+  (cd "$APP_DIR" && "$VENV/bin/python" -m filewhisper.local_llm) || \
+    echo "   (model download skipped; FileWhisper will fetch it on first use)"
+fi
 
 LOGO_PNG="$APP_DIR/filewhisper/static/logo.png"
 

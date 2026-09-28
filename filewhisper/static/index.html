@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FileWhisper</title>
+  <link rel="icon" href="/static/logo.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="/static/logo.png" />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -306,6 +308,40 @@
     .settings-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .settings-status { font-family: 'IBM Plex Mono', monospace; font-size: 0.73em; color: var(--muted); margin-top: 6px; }
 
+    /* Local model panel */
+    .local-panel { margin-bottom: 10px; padding: 10px; border-radius: 8px;
+                   background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.22); }
+    .local-panel.warn { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.3); }
+    .local-head { font-family: 'IBM Plex Mono', monospace; font-size: 0.73em; text-transform: uppercase;
+                  letter-spacing: .06em; color: var(--accent3); margin-bottom: 8px; }
+    .local-panel.warn .local-head { color: #f59e0b; }
+    .local-model { display: flex; align-items: center; gap: 8px; padding: 6px 0;
+                   border-top: 1px solid rgba(255,255,255,0.06); }
+    .local-model:first-of-type { border-top: 0; }
+    .local-model-info { flex: 1; min-width: 0; }
+    .local-model-name { font-size: 0.82em; color: var(--text); }
+    .local-model-meta { font-family: 'IBM Plex Mono', monospace; font-size: 0.68em; color: var(--muted); }
+    .local-badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.65em; padding: 2px 6px;
+                   border-radius: 4px; white-space: nowrap; }
+    .local-badge.ready { background: rgba(16,185,129,0.15); color: var(--accent3); }
+    .btn-mini { padding: 4px 9px; font-size: 0.7em; border-radius: 5px; cursor: pointer;
+                background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+                color: var(--text); white-space: nowrap; }
+    .btn-mini:hover { background: rgba(255,255,255,0.14); }
+    .btn-mini:disabled { opacity: .4; cursor: not-allowed; }
+    .dl-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); overflow: hidden; margin-top: 6px; }
+    .dl-fill { height: 100%; background: var(--accent3); transition: width .4s ease; }
+    /* answer-box-content is a flex column, so the badge needs to opt out of
+       stretching or it spans the whole bubble. */
+    .engine-badge { display: inline-block; align-self: flex-start; width: fit-content;
+                    margin-top: 8px; font-family: 'IBM Plex Mono', monospace;
+                    font-size: 0.68em; padding: 3px 8px; border-radius: 5px; }
+    .engine-badge.local { background: rgba(16,185,129,0.12); color: var(--accent3); }
+    .engine-badge.cloud { background: rgba(245,158,11,0.12); color: #f59e0b; }
+    .engine-badge.offline { background: rgba(255,255,255,0.08); color: var(--muted); }
+    .engine-note { align-self: flex-start; margin-top: 6px; font-family: 'IBM Plex Mono', monospace;
+                   font-size: 0.7em; line-height: 1.5; color: var(--muted); max-width: 60ch; }
+
     /* App Main Panel */
     .app-main {
       flex: 1;
@@ -602,10 +638,13 @@
           LLM Settings <span class="chevron" id="llmChevron">›</span>
         </button>
         <div class="collapsible-content" id="llmContent">
+          <div class="local-panel" id="localPanel" style="display:none;"></div>
           <div class="settings-grid">
             <label for="llmProvider">Provider</label>
             <select class="field" id="llmProvider">
-              <option value="free-huggingface">Free Assistant (No Key Required)</option>
+              <option value="local">On this computer (private, no key)</option>
+              <option value="ollama">Ollama / LM Studio (local server)</option>
+              <option value="free-huggingface">Free Assistant (cloud, no key)</option>
               <option value="groq">Groq</option>
               <option value="openai">OpenAI</option>
               <option value="anthropic">Anthropic Claude</option>
@@ -704,6 +743,11 @@
 
     const EXT_ICONS = { ".pdf":"📕",".txt":"📄",".md":"📝",".png":"🖼️",".jpg":"🖼️",".jpeg":"🖼️",".webp":"🖼️",".bmp":"🖼️",".tiff":"🖼️" };
     const PROVIDER_DEFAULTS = {
+      // Built-in on-device engine. `models` is filled from /local-status because
+      // the real list is whatever the backend catalog offers.
+      local: { model: "qwen3-1.7b", baseUrl: "", models: [] },
+      // Detected local server; the backend overrides baseUrl with what answers.
+      ollama: { model: "llama3.2", baseUrl: "http://127.0.0.1:11434/v1", models: [] },
       "free-huggingface": {
         model: "mistralai/Mistral-7B-Instruct-v0.3",
         // Router /v1 (OpenAI-compatible). The old /hf-inference/models endpoint
@@ -945,6 +989,149 @@
         '<div>You can close this tab. Double-click FileWhisper on your Desktop to start it again.</div></div></div>';
     };
 
+    // Hide a settings-grid row (the <label> that precedes the field, plus the field).
+    function setRowVisible(fieldId, visible) {
+      const el = document.getElementById(fieldId);
+      if (!el) return;
+      el.style.display = visible ? "" : "none";
+      const label = el.previousElementSibling;
+      if (label && label.tagName === "LABEL") label.style.display = visible ? "" : "none";
+    }
+
+    let localStatus = null;
+    let localPollTimer = null;
+
+    async function fetchLocalStatus() {
+      try {
+        const res = await fetch(`${BASE}/local-status`);
+        localStatus = await res.json();
+      } catch (e) { localStatus = null; }
+      return localStatus;
+    }
+
+    function renderLocalPanel() {
+      const panel = document.getElementById("localPanel");
+      const provider = document.getElementById("llmProvider").value;
+      if (!localStatus) { panel.innerHTML = '<div class="local-head">Checking local setup...</div>'; fetchLocalStatus().then(renderLocalPanel); return; }
+
+      if (provider === "ollama") {
+        const ext = localStatus.external || {};
+        panel.className = ext.name ? "local-panel" : "local-panel warn";
+        if (ext.name) {
+          const opts = (ext.models || []).map(m => `<option value="${m}"></option>`).join("");
+          document.getElementById("llmModelList").innerHTML = opts;
+          panel.innerHTML = `<div class="local-head">✓ ${ext.name} detected</div>`
+            + `<div class="local-model-meta">${ext.base_url} &middot; `
+            + `${(ext.models || []).length} model(s) available. Type one in Model above.</div>`;
+        } else {
+          panel.innerHTML = '<div class="local-head">No local server found</div>'
+            + '<div class="local-model-meta">Start Ollama, LM Studio, llama.cpp or Jan and press Reload. '
+            + 'Or switch to "On this computer" to use the built-in model.</div>';
+        }
+        return;
+      }
+
+      // provider === "local"
+      if (!localStatus.engine_available) {
+        panel.className = "local-panel warn";
+        panel.innerHTML = '<div class="local-head">Built-in model unavailable</div>'
+          + `<div class="local-model-meta">${escapeHtml(localStatus.reason || "")}</div>`;
+        return;
+      }
+
+      const dl = localStatus.download || {};
+      const rows = (localStatus.models || []).map(m => {
+        const busy = dl.status === "downloading" && dl.model_id === m.id;
+        const selected = m.id === (document.getElementById("llmModel").value || localStatus.default_model);
+        let right;
+        if (busy) {
+          const pct = dl.total_mb ? Math.min(99, Math.round(dl.downloaded_mb / dl.total_mb * 100)) : 0;
+          right = `<span class="local-model-meta">${pct}%</span>`;
+        } else if (m.downloaded) {
+          right = selected
+            ? '<span class="local-badge ready">in use</span>'
+            : `<button class="btn-mini" data-use="${m.id}">Use</button>`;
+        } else {
+          right = `<button class="btn-mini" data-get="${m.id}" ${dl.status === "downloading" ? "disabled" : ""}>Download</button>`;
+        }
+        return `<div class="local-model">
+            <div class="local-model-info">
+              <div class="local-model-name">${escapeHtml(m.label)}${selected && m.downloaded ? " &bull; selected" : ""}</div>
+              <div class="local-model-meta">${(m.size_mb/1000).toFixed(1)} GB &middot; ${escapeHtml(m.license)} &middot; ${escapeHtml(m.description)}</div>
+            </div>${right}
+          </div>`;
+      }).join("");
+
+      const anyReady = (localStatus.models || []).some(m => m.downloaded);
+      panel.className = anyReady ? "local-panel" : "local-panel warn";
+      let head = anyReady
+        ? '<div class="local-head">✓ Runs on this computer &mdash; nothing is uploaded</div>'
+        : '<div class="local-head">One-time download needed</div>';
+      if (!anyReady) {
+        head += '<div class="local-model-meta" style="margin-bottom:8px;">Pick a model to download once. '
+              + 'After that your documents and questions never leave this machine.</div>';
+      }
+      let bar = "";
+      if (dl.status === "downloading") {
+        const pct = dl.total_mb ? Math.min(99, Math.round(dl.downloaded_mb / dl.total_mb * 100)) : 0;
+        const shown = Math.min(Math.round(dl.downloaded_mb), dl.total_mb);
+        const mins = Math.floor((dl.elapsed_s || 0) / 60), secs = (dl.elapsed_s || 0) % 60;
+        const elapsed = mins ? `${mins}m ${secs}s` : `${secs}s`;
+        bar = `<div class="dl-bar"><div class="dl-fill" style="width:${pct}%"></div></div>`
+            + `<div class="local-model-meta" style="margin-top:4px;">Downloading ${shown} of ${dl.total_mb} MB &middot; ${elapsed} elapsed. `
+            + `Progress moves in jumps; you can keep using the app.</div>`;
+      } else if (dl.status === "error" && dl.error) {
+        bar = `<div class="local-model-meta" style="margin-top:6px;color:#f59e0b;">Download failed: ${escapeHtml(dl.error)}</div>`;
+      }
+      panel.innerHTML = head + rows + bar;
+
+      panel.querySelectorAll("[data-get]").forEach(b => {
+        b.onclick = async () => {
+          b.disabled = true;
+          await fetch(`${BASE}/local-download`, {
+            method: "POST", headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({model_id: b.dataset.get})
+          });
+          startLocalPolling();
+        };
+      });
+      panel.querySelectorAll("[data-use]").forEach(b => {
+        b.onclick = async () => {
+          document.getElementById("llmModel").value = b.dataset.use;
+          document.getElementById("saveLlmBtn").click();
+        };
+      });
+
+      if (dl.status === "downloading") startLocalPolling(); else stopLocalPolling();
+    }
+
+    function startLocalPolling() {
+      if (localPollTimer) return;
+      localPollTimer = setInterval(async () => {
+        const before = localStatus && localStatus.download ? localStatus.download.status : null;
+        await fetchLocalStatus();
+        renderLocalPanel();
+        const now = localStatus && localStatus.download ? localStatus.download.status : null;
+        if (now !== "downloading") {
+          stopLocalPolling();
+          // A finished download is only useful once it is the selected model.
+          if (before === "downloading" && now === "done") {
+            document.getElementById("llmModel").value = localStatus.download.model_id;
+            document.getElementById("saveLlmBtn").click();
+          }
+        }
+      }, 1500);
+    }
+
+    function stopLocalPolling() {
+      if (localPollTimer) { clearInterval(localPollTimer); localPollTimer = null; }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, c =>
+        ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
+
     function applyProviderDefaults() {
       const provider = document.getElementById("llmProvider").value;
       const defaults = PROVIDER_DEFAULTS[provider];
@@ -957,6 +1144,16 @@
       if (!model.value.trim()) model.value = defaults.model;
       if (provider !== "custom") baseUrl.value = defaults.baseUrl;
       baseUrl.disabled = provider !== "custom";
+
+      // The local engine picks its model from the panel below, and neither local
+      // option takes a key, so hide the fields that would only confuse.
+      const isLocal = provider === "local" || provider === "ollama";
+      setRowVisible("llmApiKey", !isLocal);
+      setRowVisible("llmKeyNote", !isLocal);
+      setRowVisible("llmModel", provider !== "local");
+      setRowVisible("llmBaseUrl", provider !== "local");
+      document.getElementById("localPanel").style.display = isLocal ? "block" : "none";
+      if (isLocal) renderLocalPanel();
 
       const placeholderMap = {
         "free-huggingface": "Optional / keyless (free fallback active)",
@@ -973,9 +1170,9 @@
       const status = document.getElementById("llmStatus");
       status.innerText = "Loading settings...";
       try {
-        const res = await fetch(`${BASE}/llm-config`);
+        const [res] = await Promise.all([fetch(`${BASE}/llm-config`), fetchLocalStatus()]);
         const data = await res.json();
-        document.getElementById("llmProvider").value = data.provider || "free-huggingface";
+        document.getElementById("llmProvider").value = data.provider || "local";
         document.getElementById("llmModel").value = data.model || "";
         document.getElementById("llmBaseUrl").value = data.base_url || "";
         document.getElementById("llmApiKey").value = "";
@@ -983,12 +1180,33 @@
           ? "Configured."
           : (data.provider === "free-huggingface" ? "Optional / keyless." : "Not configured.");
         applyProviderDefaults();
-        status.innerText = `Active: ${data.provider} / ${data.model}${data.has_api_key ? " (key set)" : (data.provider === "free-huggingface" ? " (free, keyless)" : " (no key)")}`;
-        
-        // Auto-collapse if key is set or if using the free keyless assistant
+
+        const modelReady = localStatus && localStatus.engine_available
+          && (localStatus.models || []).some(m => m.id === data.model && m.downloaded);
+        const serverReady = !!(localStatus && localStatus.external && localStatus.external.name);
+        const localReady = data.provider === "local" ? modelReady
+                         : data.provider === "ollama" ? serverReady
+                         : true;
+        if (data.provider === "local") {
+          status.innerText = localReady
+            ? `Active: ${data.model} on this computer (private)`
+            : "Local model not downloaded yet. Pick one above.";
+        } else if (data.provider === "ollama") {
+          const ext = (localStatus && localStatus.external) || {};
+          status.innerText = ext.name
+            ? `Active: ${data.model} via ${ext.name} (private)`
+            : "No local model server detected.";
+        } else {
+          status.innerText = `Active: ${data.provider} / ${data.model}${data.has_api_key ? " (key set)" : (data.provider === "free-huggingface" ? " (free, keyless)" : " (no key)")}`;
+        }
+
+        // Collapse once the user has a working setup; stay open when they still
+        // need to do something (download a model, paste a key).
         const content = document.getElementById('llmContent');
         const chevron = document.getElementById('llmChevron');
-        if (data.has_api_key || data.provider === "free-huggingface") {
+        const configured = data.has_api_key || data.provider === "local"
+          || data.provider === "ollama" || data.provider === "free-huggingface";
+        if (localReady && configured) {
           content.classList.remove('open');
           chevron.classList.remove('open');
         } else {
@@ -1033,7 +1251,16 @@
           document.getElementById("llmKeyNote").innerText = data.has_api_key
             ? "Configured."
             : "Not configured.";
-          status.innerText = `Saved: ${data.provider} / ${data.model}`;
+          if (data.is_local) {
+            // Re-render so the newly chosen model shows as "in use".
+            await fetchLocalStatus();
+            renderLocalPanel();
+            status.innerText = data.provider === "local"
+              ? `Saved: ${data.model} runs on this computer`
+              : `Saved: ${data.model} via your local server`;
+          } else {
+            status.innerText = `Saved: ${data.provider} / ${data.model}`;
+          }
         }
       } catch(e) {
         status.innerText = "Could not reach backend.";
@@ -1179,7 +1406,47 @@
           data.answer || "No answer returned.",
           6,
           () => { chatScroll.scrollTop = chatScroll.scrollHeight; },
-          () => { setTimeout(showFollowUp, 200); }
+          () => {
+            // Say plainly whether this answer stayed on the machine.
+            if (data.engine) {
+              const badge = document.createElement("div");
+              if (data.engine.startsWith("local:")) {
+                badge.className = "engine-badge local";
+                badge.innerText = "🔒 " + data.engine.slice(6) + " on this computer";
+              } else if (data.engine === "offline-reader") {
+                badge.className = "engine-badge offline";
+                badge.innerText = "📄 Quoted from your documents";
+                // Asking can itself kick off the one-time model download, so
+                // refresh the panel and show progress without making the user
+                // go looking for it.
+                fetchLocalStatus().then(() => {
+                  renderLocalPanel();
+                  if (localStatus && localStatus.download
+                      && localStatus.download.status === "downloading") {
+                    const content = document.getElementById('llmContent');
+                    const chevron = document.getElementById('llmChevron');
+                    content.classList.add('open');
+                    chevron.classList.add('open');
+                    startLocalPolling();
+                  }
+                });
+                if (data.engine_note) {
+                  const note = document.createElement("div");
+                  note.className = "engine-note";
+                  note.innerText = data.engine_note;
+                  answerBox.appendChild(badge);
+                  answerBox.appendChild(note);
+                  setTimeout(showFollowUp, 200);
+                  return;
+                }
+              } else {
+                badge.className = "engine-badge cloud";
+                badge.innerText = "☁️ Sent to " + data.engine.replace("cloud:", "");
+              }
+              answerBox.appendChild(badge);
+            }
+            setTimeout(showFollowUp, 200);
+          }
         );
 
         // Show source file tags

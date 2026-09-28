@@ -139,6 +139,20 @@ if ($LASTEXITCODE -ne 0) {
 try { & $VenvPy -c "from rapidocr_onnxruntime import RapidOCR; RapidOCR(); print('   OCR ready')" } catch { Write-Host "   (OCR warmup skipped)" }
 if ($LASTEXITCODE -ne 0) { Write-Host "   (OCR warmup skipped - scanned PDFs/images may not be readable)" }
 
+# 5b. Pre-download the on-device language model so the first question is answered
+#     locally with no wait. Opt out with $env:FILEWHISPER_SKIP_MODEL=1; the app
+#     then fetches it on demand (with a progress bar) the first time it is asked.
+if (-not $env:FILEWHISPER_SKIP_MODEL) {
+    Write-Host "-> Downloading the on-device language model (about 1.4 GB, one time)."
+    Write-Host "   Your documents stay on this computer. Skip with `$env:FILEWHISPER_SKIP_MODEL=1."
+    Push-Location $AppDir
+    try { & $VenvPy -m filewhisper.local_llm } catch { }
+    Pop-Location
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "   (model download skipped; FileWhisper will fetch it on first use)"
+    }
+}
+
 # 6. Desktop shortcut with the logo icon, pointing straight at pythonw.exe.
 #    pythonw is a GUI-subsystem executable, so no console window ever appears -
 #    no VBScript needed (VBScript is deprecated and optional on Windows 11).

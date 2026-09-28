@@ -7,3 +7,8 @@ python-dotenv
 langgraph
 PyMuPDF
 rapidocr-onnxruntime
+huggingface_hub
+# Built-in local LLM. No wheel exists for Python 3.10 or for Intel Macs, so the
+# marker keeps `pip install -r` working there; FileWhisper falls back to a
+# detected Ollama/LM Studio server, or the offline reader.
+onnxruntime-genai>=0.9.0; python_version >= "3.11" and (sys_platform != "darwin" or platform_machine != "x86_64")
